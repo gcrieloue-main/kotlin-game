@@ -2,19 +2,18 @@ package com.gcrielou.game
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.viewport.FitViewport
+import utils.clearScreen
+import utils.drawSprite
+import utils.use
 
 /**
  * Created by gilles on 03-Dec-17.
  */
-
 
 class Game : ApplicationAdapter() {
     lateinit var batch: SpriteBatch
@@ -28,8 +27,6 @@ class Game : ApplicationAdapter() {
         batch = SpriteBatch()
         img = Texture("sprites01.png")
         camera = OrthographicCamera()
-        // camera coordinates must start in the bottom left
-
         viewport = FitViewport(1080f, 720f, camera)
     }
 
@@ -37,7 +34,6 @@ class Game : ApplicationAdapter() {
         clearScreen()
         batch.projectionMatrix = camera.combined
         batch.use { draw() }
-
     }
 
     override fun resize(width: Int, height: Int) {
@@ -47,72 +43,66 @@ class Game : ApplicationAdapter() {
     private var lastAnimationDrawing: Float = 0f
     private var currentSprite = 0
 
+    companion object {
+        const val SPRITE_SIZE = 16f
+    }
+
+    class Character() {
+
+        class Sprite(var x: Int, var y: Int, var frameNumber: Int = 1) {}
+
+        private var lastAnimationDrawing: Float = 0f
+        private var currentSprite = 1
+        private var speed = 0.1
+        private var currentState = "RUNNING"
+        private var lastState = "RUNNING"
+
+        var statesSprites: Map<String, Array<Sprite>> = mapOf("RUNNING" to arrayOf(Sprite(9, 1), Sprite(9, 2), Sprite(9, 3)))
+
+        public fun drawCharacter(batch: Batch, img: Texture) {
+
+            var sprites: Array<Sprite>? = statesSprites.get(currentState)
+
+            val deltaTime = Gdx.graphics.deltaTime
+            lastAnimationDrawing += deltaTime
+
+            if (lastAnimationDrawing >= speed) {
+                currentSprite = currentSprite % sprites!!.size + 1
+                lastAnimationDrawing = 0f
+            }
+
+            batch.drawSprite(img, 200f, 50f,
+                    SPRITE_SIZE, 9, currentSprite)
+        }
+    }
+
+    var character: Character = Character()
+
     private fun draw() {
+        character.drawCharacter(batch, img)
+    }
 
-        var spriteSizePx = 16
-        var spriteSize = 16f
-        var scale = 2f
-
+    private fun showSpritesSamples(deltaTime: Float, speed: Double) {
         val deltaTime = Gdx.graphics.deltaTime
-        val speep = 0.1
+        val speed = 0.1
 
-        if (lastAnimationDrawing >= speep) {
+        if (lastAnimationDrawing >= speed) {
             lastAnimationDrawing = 0f
             val spriteStart = 1
-            val spriteEnd = 5
+            val spriteEnd = 10
             currentSprite = (currentSprite + spriteStart) % spriteEnd + 1
         } else lastAnimationDrawing += deltaTime
 
-        batch.draw(img, 200f, 100f,
-                spriteSize * 3, spriteSize,
-                spriteSize, spriteSize,
-                scale, scale,
-                0f,
-                spriteSizePx * currentSprite, spriteSizePx,
-                spriteSizePx, spriteSizePx,
-                false, false)
 
-        batch.draw(img, 200f, 100f + 2 * spriteSize,
-                spriteSize * 3, spriteSize,
-                spriteSize, spriteSize,
-                scale, scale,
-                0f,
-                spriteSizePx * currentSprite, spriteSizePx * 2,
-                spriteSizePx, spriteSizePx,
-                false, false)
+        var currentY = 100f
+        var currentLine = 1
+        for (i in 1..10) {
+            batch.drawSprite(img, 200f, currentY,
+                    SPRITE_SIZE, currentLine, currentSprite)
 
-        batch.draw(img, 200f, 100f + 4 * spriteSize,
-                spriteSize * 3, spriteSize,
-                spriteSize, spriteSize,
-                scale, scale,
-                0f,
-                spriteSizePx * currentSprite, spriteSizePx * 3,
-                spriteSizePx, spriteSizePx,
-                false, false)
-
-        batch.draw(img, 200f, 100f + 6 * spriteSize,
-                spriteSize * 3, spriteSize,
-                spriteSize, spriteSize,
-                scale, scale,
-                0f,
-                spriteSizePx * currentSprite, spriteSizePx * 4,
-                spriteSizePx, spriteSizePx,
-                false, false)
-    }
-
-    /*
-    inline replace the function directly at compilation so no function is created,
-    and therefore, the performance is the same
-     */
-    inline fun Batch.use(action: () -> Unit) {
-        begin()
-        action()
-        end()
-    }
-
-    private fun clearScreen() {
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            currentY += SPRITE_SIZE * 2
+            currentLine++
+        }
     }
 
     override fun dispose() {
