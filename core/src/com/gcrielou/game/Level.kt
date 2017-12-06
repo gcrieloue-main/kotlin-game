@@ -61,13 +61,8 @@ public class Level(var texture: Texture) {
         var isLastTile = false
         if (level.size - 1 == y.toInt()) isLastTile = true
         if (!isLastTile) {
-            println(level.size - 1 - y.toInt() - 1)
             // get the type of the top tile
-            val line = level.get(level.size - 1 - y.toInt() - 1)
-            val tileStringRepresentation = line.get((x).toInt())
-            val tile: Tile? = tileSet.get(tileStringRepresentation)
-            println(tile?.type)
-            isLastTile = (tile?.type != tileType.EMPTY)
+            isLastTile = (getTileType(x.toInt(), level.size - 1 - y.toInt() - 1) != tileType.EMPTY)
 
         }
         val remainingSpaceInTile = y.toInt() + 1 - y
@@ -75,13 +70,11 @@ public class Level(var texture: Texture) {
         return remainingSpaceInTile > 0.2 || !isLastTile
     }
 
+
     fun canMoveRight(x: Float, y: Float): Boolean {
         if (level[y.toInt()].size == x.toInt() + 1) return false
         // get the type of the right tile
-        val line = level.get(y.toInt())
-        val tileStringRepresentation = line.get((x + 1).toInt())
-        val tile: Tile? = tileSet.get(tileStringRepresentation)
-        return (tile?.type == tileType.EMPTY)
+        return (getTileType((x + 1).toInt(), y.toInt()) == tileType.EMPTY)
     }
 
     fun canMoveLeft(x: Float, y: Float): Boolean {
@@ -89,11 +82,7 @@ public class Level(var texture: Texture) {
         if (x.toInt() == 0 || level[y.toInt()].size == x.toInt() - 1) isLastTile = true
         if (!isLastTile) {
             // get the type of the left tile
-            val line = level.get(y.toInt())
-            val tileStringRepresentation = line.get((x - 1).toInt())
-            val tile: Tile? = tileSet.get(tileStringRepresentation)
-            println(tile?.type)
-            isLastTile = (tile?.type != tileType.EMPTY)
+            isLastTile = (getTileType((x - 1).toInt(), y.toInt()) != tileType.EMPTY)
         }
         val remainingSpaceInTile = x - x.toInt()
         return remainingSpaceInTile > 0.2 || !isLastTile
@@ -104,14 +93,18 @@ public class Level(var texture: Texture) {
         if (y.toInt() == 0) isLastTile = true
         if (!isLastTile) {
             // get the type of the bottom tile
-            val line = level.get(y.toInt() - 1)
-            val tileStringRepresentation = line.get((x).toInt())
-            val tile: Tile? = tileSet.get(tileStringRepresentation)
-            println(tile?.type)
-            isLastTile = (tile?.type != tileType.EMPTY)
+            isLastTile = (getTileType(x.toInt(), y.toInt() - 1) != tileType.EMPTY)
         }
         val remainingSpaceInTile = y - y.toInt()
+        println("$remainingSpaceInTile $isLastTile ${remainingSpaceInTile > 0.2} ${!isLastTile}")
         return remainingSpaceInTile > 0.2 || !isLastTile
+    }
+
+    private fun getTileType(x: Int, y: Int): tileType? {
+        val line = level.get(y)
+        val tileStringRepresentation = line.get(x)
+        val tile: Tile? = tileSet.get(tileStringRepresentation)
+        return tile?.type
     }
 
     fun draw(batch: Batch) {

@@ -19,7 +19,7 @@ class Character() {
 
     private var lastAnimationDrawing: Float = 0f
     private var currentSprite = 1
-    private var speed = 0.1
+    private var animationSpeed = 0.1
 
     var statesSprites: Map<String, Array<Sprite>> = mapOf(
             "RUNNING" to arrayOf(Sprite(9, 1), Sprite(9, 2), Sprite(9, 3)),
@@ -42,7 +42,7 @@ class Character() {
         val deltaTime = Gdx.graphics.deltaTime
         lastAnimationDrawing += deltaTime
 
-        if (lastAnimationDrawing >= speed) {
+        if (lastAnimationDrawing >= animationSpeed) {
             val nbSprites = sprites?.size ?: 0
             currentSprite = (currentSprite + 1) % nbSprites
             lastAnimationDrawing = 0f
@@ -60,7 +60,7 @@ class Character() {
     }
 
     fun moveRight() {
-        positionX += Gdx.graphics.deltaTime * Config.SPEED
+        positionX += Gdx.graphics.deltaTime * Config.SPEED * 2
         //println("${Gdx.graphics.deltaTime} * ${Config.SPEED} $positionX")
     }
 

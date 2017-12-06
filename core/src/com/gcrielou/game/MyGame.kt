@@ -53,8 +53,8 @@ class MyGame : GameBase() {
 
     private fun draw() {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            character.currentState = "RUNNING"
             if (level.canMoveDown(character.positionX, character.positionY))
-                character.currentState = "RUNNING"
                 character.moveDown()
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
