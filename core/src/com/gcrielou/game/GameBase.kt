@@ -14,7 +14,6 @@ import utils.use
 /**
  * Created by gilles on 03-Dec-17.
  */
-
 open class GameBase : ApplicationListener, InputProcessor {
     override fun resize(width: Int, height: Int) = Unit
     override fun create() = Unit

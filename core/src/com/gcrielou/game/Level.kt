@@ -1,13 +1,13 @@
 package com.gcrielou.game;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import utils.drawSprite
 
 /**
  * Created by gcrielou on 05/12/2017.
  */
-public class Level(var texture: Texture) {
+class Level(var texture: Texture) {
 
     enum class tileType {
         SOLID,
@@ -34,22 +34,23 @@ public class Level(var texture: Texture) {
         private const val MUSH2 = "MUSH2"
     }
 
-    var tileCTL = Tile(Sprite(0, 1))
-    var tileT = Tile(Sprite(0, 1))
+    //<editor-fold desc="tiles">
+    var tileCTL = Tile(Sprite(0, 0))
+    var tileT = Tile(Sprite(1, 0))
     var tileCTR = Tile(Sprite(5, 0))
 
-    var tileM = Tile(Sprite(1, 4))
+    var tileM = Tile(Sprite(4, 2))
     var tileL = Tile(Sprite(0, 1))
     var tileR = Tile(Sprite(5, 1))
 
-    var tileCBR = Tile(Sprite(5, 4))
-    var tileB = Tile(Sprite(1, 4))
     var tileCBL = Tile(Sprite(0, 4))
+    var tileB = Tile(Sprite(1, 4))
+    var tileCBR = Tile(Sprite(5, 4))
 
     var tileRock = Tile(Sprite(8, 7), tileType.SOLID)
-    var tileRock2 = Tile(Sprite(7, 8), tileType.SOLID)
-    var tileMushroom = Tile(Sprite(7, 7))
-    var tileMushroom2 = Tile(Sprite(7, 6))
+    var tileRock2 = Tile(Sprite(9, 7), tileType.SOLID)
+    var tileMushroom = Tile(Sprite(10, 6))
+    var tileMushroom2 = Tile(Sprite(10, 7))
 
     var tileSet: Map<String, Tile> = mapOf(
             TOP_G to tileT,
@@ -66,10 +67,9 @@ public class Level(var texture: Texture) {
             MUSH1 to tileMushroom,
             MUSH2 to tileMushroom2
     )
-
+    //</editor-fold>
 
     var levelLayer: Array<Array<String>>
-
     var elementsLayer: Array<Array<String>>
 
     init {
@@ -101,7 +101,6 @@ public class Level(var texture: Texture) {
         // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
         levelLayer = levelLayer.reversedArray()
         elementsLayer = elementsLayer.reversedArray()
-
     }
 
     fun canMoveUp(x: Float, y: Float): Boolean {
@@ -109,7 +108,7 @@ public class Level(var texture: Texture) {
         if (levelLayer.size - 1 == y.toInt()) isLastTile = true
         if (!isLastTile) {
             // get the type of the top tile
-            isLastTile = (getTileType(x.toInt(), levelLayer.size - 1 - y.toInt() - 1) != tileType.EMPTY)
+            isLastTile = (getTileType(x.toInt(), y.toInt() + 1) != tileType.EMPTY)
 
         }
         val remainingSpaceInTile = y.toInt() + 1 - y
@@ -148,45 +147,53 @@ public class Level(var texture: Texture) {
 
     private fun getTileType(x: Int, y: Int): tileType? {
         if (elementsLayer.size > y) {
-            val tileElementsStringRepresentation = elementsLayer.get(y).get(x)
-            if (tileElementsStringRepresentation.isNotEmpty()) {
-                val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
-                val type = tileElements?.type
-                println("element type ($x, $y) : ${tileElements?.type}")
-                if (type != tileType.EMPTY)
-                    return type
-            }
-        }
-
-        val tileLevelStringRepresentation = levelLayer.get(y).get(x)
-        val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
-        println("level type ($x, $y) : ${tileLevel?.type}")
-        return tileLevel?.type
-    }
-
-    fun draw(batch: Batch) {
-        for ((rowIndex, row) in levelLayer.withIndex()) {
-            for ((colIndex, col) in row.withIndex()) {
-                if (col.isNotEmpty()) {
-                    val x = tileSet.get(col)?.sprite?.y ?: 0
-                    val y = tileSet.get(col)?.sprite?.x ?: 0
-                    batch.drawSprite(texture,
-                            colIndex, rowIndex,
-                            Config.SPRITE_SIZE,
-                            x, y)
+            val row = elementsLayer.get(y)
+            if (x < row.size) {
+                val tileElementsStringRepresentation = row.get(x)
+                if (tileElementsStringRepresentation.isNotEmpty()) {
+                    val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
+                    val type = tileElements?.type
+                    println("element type ($x, $y) : ${tileElements?.type}")
+                    if (type != tileType.EMPTY)
+                        return type
                 }
             }
         }
 
-        for ((rowIndex, row) in elementsLayer.withIndex()) {
-            for ((colIndex, col) in row.withIndex()) {
+        val row = levelLayer.get(y)
+        if (y < row.size) {
+            val tileLevelStringRepresentation = row.get(x)
+            val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
+            println("level type ($x, $y) : ${tileLevel?.type}")
+            return tileLevel?.type
+        }
+
+        return null
+    }
+
+    fun draw(batch: Batch) {
+        for ((y, row) in levelLayer.withIndex()) {
+            for ((x, col) in row.withIndex()) {
                 if (col.isNotEmpty()) {
-                    val x = tileSet.get(col)?.sprite?.x ?: 0
-                    val y = tileSet.get(col)?.sprite?.y ?: 0
+                    val spriteX = tileSet.get(col)?.sprite?.x ?: 0
+                    val spriteY = tileSet.get(col)?.sprite?.y ?: 0
                     batch.drawSprite(texture,
-                            colIndex, rowIndex,
+                            x, y,
                             Config.SPRITE_SIZE,
-                            x, y)
+                            spriteX, spriteY)
+                }
+            }
+        }
+
+        for ((y, row) in elementsLayer.withIndex()) {
+            for ((x, col) in row.withIndex()) {
+                if (col.isNotEmpty()) {
+                    val spriteX = tileSet.get(col)?.sprite?.x ?: 0
+                    val spriteY = tileSet.get(col)?.sprite?.y ?: 0
+                    batch.drawSprite(texture,
+                            x, y,
+                            Config.SPRITE_SIZE,
+                            spriteX, spriteY)
                 }
             }
         }

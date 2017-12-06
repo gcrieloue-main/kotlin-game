@@ -8,7 +8,6 @@ import utils.drawSprite
 /**
  * Created by gcrielou on 05/12/2017.
  */
-
 class Character() {
 
     var currentState = "IDLE"
@@ -49,10 +48,11 @@ class Character() {
         }
 
         val sprite = sprites?.get(currentSprite)
-        val spriteX = sprite?.x ?: 0
-        val spriteY = sprite?.y ?: 0
         batch.drawSprite(img, positionX, positionY,
-                Config.SPRITE_SIZE, spriteY, spriteX, flipX = sprite?.flipX ?: false)
+                Config.SPRITE_SIZE,
+                sprite?.y ?: 0,
+                sprite?.x ?: 0,
+                flipX = sprite?.flipX ?: false)
     }
 
     fun moveLeft() {

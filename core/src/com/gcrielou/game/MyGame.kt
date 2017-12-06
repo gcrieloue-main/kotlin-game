@@ -17,7 +17,6 @@ import kotlin.system.exitProcess
 /**
  * Created by gilles on 03-Dec-17.
  */
-
 class MyGame : GameBase() {
 
     lateinit var batch: SpriteBatch
