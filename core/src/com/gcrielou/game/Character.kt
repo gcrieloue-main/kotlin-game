@@ -60,8 +60,7 @@ class Character() {
     }
 
     fun moveRight() {
-        positionX += Gdx.graphics.deltaTime * Config.SPEED * 2
-        //println("${Gdx.graphics.deltaTime} * ${Config.SPEED} $positionX")
+        positionX += Gdx.graphics.deltaTime * Config.SPEED
     }
 
     fun moveUp() {
