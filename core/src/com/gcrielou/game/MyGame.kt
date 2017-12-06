@@ -26,6 +26,7 @@ class MyGame : GameBase() {
     var character: Character = Character()
     lateinit var level: Level
     lateinit var renderer: ShapeRenderer
+    var displayGrid = false
 
     override fun create() {
         batch = SpriteBatch()
@@ -42,8 +43,9 @@ class MyGame : GameBase() {
         batch.projectionMatrix = camera.combined
         batch.use { draw() }
 
-        drawGrid()
-
+        if (displayGrid) {
+            drawGrid()
+        }
     }
 
     override fun resize(width: Int, height: Int) {
@@ -100,7 +102,9 @@ class MyGame : GameBase() {
     }
 
     override fun keyDown(keycode: Int): Boolean {
-
+        if (Input.Keys.ENTER == keycode) {
+            displayGrid = !displayGrid
+        }
         return false
     }
 

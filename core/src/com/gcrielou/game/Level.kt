@@ -83,7 +83,6 @@ class Level(var texture: Texture) {
                 arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, CTR_G),
                 arrayOf(LEF_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
                 arrayOf(CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G)
-
         )
 
         elementsLayer = arrayOf(
@@ -146,7 +145,7 @@ class Level(var texture: Texture) {
     }
 
     private fun getTileType(x: Int, y: Int): tileType? {
-        if (elementsLayer.size > y) {
+        if (y < elementsLayer.size) {
             val row = elementsLayer.get(y)
             if (x < row.size) {
                 val tileElementsStringRepresentation = row.get(x)
