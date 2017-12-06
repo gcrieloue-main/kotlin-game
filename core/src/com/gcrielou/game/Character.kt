@@ -13,8 +13,8 @@ class Character() {
     var currentState = "IDLE"
     private var lastState = "RUNNING"
 
-    var positionX = 0f
-    var positionY = 0f
+    var positionX = 2f
+    var positionY = 1f
 
     private var lastAnimationDrawing: Float = 0f
     private var currentSprite = 1

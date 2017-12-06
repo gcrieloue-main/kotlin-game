@@ -1,18 +1,17 @@
 package com.gcrielou.game
 
 import com.badlogic.gdx.*
+import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import utils.clearScreen
-import utils.drawSprite
 import utils.use
-import kotlin.system.exitProcess
 
 /**
  * Created by gilles on 03-Dec-17.
@@ -23,10 +22,16 @@ class MyGame : GameBase() {
     lateinit var img: Texture
     lateinit var camera: OrthographicCamera
     lateinit var viewport: FitViewport
+    lateinit var renderer: ShapeRenderer
+
+    lateinit var music: Music
+    lateinit var walkSound: Sound
+
     var character: Character = Character()
     lateinit var level: Level
-    lateinit var renderer: ShapeRenderer
+
     var displayGrid = false
+    var hasSound = false
 
     override fun create() {
         batch = SpriteBatch()
@@ -36,6 +41,9 @@ class MyGame : GameBase() {
         viewport = FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera)
         renderer = ShapeRenderer()
         Gdx.input.inputProcessor = this
+
+        music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
+        walkSound = Gdx.audio.newSound(FileHandle("sfx_step_grass_l.mp3"))
     }
 
     override fun render() {
@@ -97,13 +105,14 @@ class MyGame : GameBase() {
         renderer.end()
     }
 
-    companion object {
-
-    }
-
     override fun keyDown(keycode: Int): Boolean {
-        if (Input.Keys.ENTER == keycode) {
-            displayGrid = !displayGrid
+        when (keycode) {
+            Input.Keys.ENTER -> displayGrid = !displayGrid
+            Input.Keys.M -> {
+                hasSound = !hasSound
+                if (music.isPlaying) music.pause()
+                else music.play()
+            }
         }
         return false
     }
@@ -117,6 +126,8 @@ class MyGame : GameBase() {
         batch.dispose()
         img.dispose()
         renderer.dispose()
+        music.dispose()
+        walkSound.dispose()
     }
 
 

@@ -22,6 +22,7 @@ class Level(var texture: Texture) {
         private const val TOP_G = "TOP_G"
         private const val BOT_G = "BOT_G"
         private const val CBL_G = "CBL_G"
+        private const val CBLFG = "CBLFG"
         private const val CBR_G = "CBR_G"
         private const val CTL_G = "CTL_G"
         private const val CTR_G = "CTR_G"
@@ -32,6 +33,12 @@ class Level(var texture: Texture) {
         private const val ROCK2 = "ROCK2"
         private const val MUSH1 = "MUSH1"
         private const val MUSH2 = "MUSH2"
+        private const val H_WAY = "HWAY"
+        private const val V_WAY = "VWAY"
+        private const val CTWAY = "CTWAY"
+        private const val FLOA1 = "FLOA1"
+        private const val FLOA2 = "FLOA2"
+        private const val FLOA3 = "FLOA3"
     }
 
     //<editor-fold desc="tiles">
@@ -44,8 +51,16 @@ class Level(var texture: Texture) {
     var tileR = Tile(Sprite(5, 1))
 
     var tileCBL = Tile(Sprite(0, 4))
+    var tileCBLFG = Tile(Sprite(3, 1))
     var tileB = Tile(Sprite(1, 4))
     var tileCBR = Tile(Sprite(5, 4))
+    var tileHWAY = Tile(Sprite(7, 0))
+    var tileVWAY = Tile(Sprite(6, 1))
+    var tileCTWAY = Tile(Sprite(6, 0))
+
+    var tileFLOA1 = Tile(Sprite(14, 4), tileType.SOLID)
+    var tileFLOA2 = Tile(Sprite(15, 4), tileType.SOLID)
+    var tileFLOA3 = Tile(Sprite(16, 4), tileType.SOLID)
 
     var tileRock = Tile(Sprite(8, 7), tileType.SOLID)
     var tileRock2 = Tile(Sprite(9, 7), tileType.SOLID)
@@ -56,12 +71,19 @@ class Level(var texture: Texture) {
             TOP_G to tileT,
             BOT_G to tileB,
             CBL_G to tileCBL,
+            CBLFG to tileCBLFG,
             CBR_G to tileCBR,
             CTL_G to tileCTL,
             CTR_G to tileCTR,
             MID_G to tileM,
             RIG_G to tileR,
             LEF_G to tileL,
+            H_WAY to tileHWAY,
+            V_WAY to tileVWAY,
+            CTWAY to tileCTWAY,
+            FLOA1 to tileFLOA1,
+            FLOA2 to tileFLOA2,
+            FLOA3 to tileFLOA3,
             ROCK1 to tileRock,
             ROCK2 to tileRock2,
             MUSH1 to tileMushroom,
@@ -75,14 +97,14 @@ class Level(var texture: Texture) {
     init {
         levelLayer = arrayOf(
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTL_G, TOP_G, CTR_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY, CBL_G, BOT_G, CBR_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY),
-                arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, CTR_G),
-                arrayOf(LEF_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
-                arrayOf(CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G)
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTWAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, RIG_G),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, FLOA1, FLOA2, FLOA3, CBL_G, BOT_G, CBR_G),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
+                arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, MID_G, TOP_G, TOP_G, CTR_G),
+                arrayOf(CBL_G, CBLFG, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
+                arrayOf(EMPTY, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G)
         )
 
         elementsLayer = arrayOf(
@@ -111,7 +133,7 @@ class Level(var texture: Texture) {
 
         }
         val remainingSpaceInTile = y.toInt() + 1 - y
-        return remainingSpaceInTile > 0.2 || !isLastTile
+        return remainingSpaceInTile > 0.1 || !isLastTile
     }
 
 
@@ -129,7 +151,7 @@ class Level(var texture: Texture) {
             isLastTile = (getTileType((x - 1).toInt(), y.toInt()) != tileType.EMPTY)
         }
         val remainingSpaceInTile = x - x.toInt()
-        return remainingSpaceInTile > 0.2 || !isLastTile
+        return remainingSpaceInTile > 0.1 || !isLastTile
     }
 
     fun canMoveDown(x: Float, y: Float): Boolean {
@@ -160,7 +182,7 @@ class Level(var texture: Texture) {
         }
 
         val row = levelLayer.get(y)
-        if (y < row.size) {
+        if (x < row.size) {
             val tileLevelStringRepresentation = row.get(x)
             val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
             println("level type ($x, $y) : ${tileLevel?.type}")
