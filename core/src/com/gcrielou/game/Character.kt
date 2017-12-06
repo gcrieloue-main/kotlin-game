@@ -14,12 +14,16 @@ class Character() {
     var currentState = "IDLE"
     private var lastState = "RUNNING"
 
+    var positionX = 0f
+    var positionY = 0f
+
     private var lastAnimationDrawing: Float = 0f
     private var currentSprite = 1
     private var speed = 0.1
 
     var statesSprites: Map<String, Array<Sprite>> = mapOf(
             "RUNNING" to arrayOf(Sprite(9, 1), Sprite(9, 2), Sprite(9, 3)),
+            "RUNNING_LEFT" to arrayOf(Sprite(9, 1, flipX = true), Sprite(9, 2, flipX = true), Sprite(9, 3, flipX = true)),
             "IDLE" to arrayOf(Sprite(7, 1), Sprite(7, 2), Sprite(7, 3), Sprite(7, 3)),
             "JUMP" to arrayOf(Sprite(12, 1), Sprite(12, 2))
     )
@@ -44,7 +48,28 @@ class Character() {
             lastAnimationDrawing = 0f
         }
 
-        batch.drawSprite(img, 200f, 50f,
-                Config.SPRITE_SIZE, sprites!![currentSprite].x, sprites!![currentSprite].y)
+        val sprite = sprites?.get(currentSprite)
+        val spriteX = sprite?.x ?: 0
+        val spriteY = sprite?.y ?: 0
+        batch.drawSprite(img, positionX, positionY,
+                Config.SPRITE_SIZE, spriteY, spriteX, flipX = sprite?.flipX ?: false)
     }
+
+    fun moveLeft() {
+        positionX -= Gdx.graphics.deltaTime * Config.SPEED
+    }
+
+    fun moveRight() {
+        positionX += Gdx.graphics.deltaTime * Config.SPEED
+        //println("${Gdx.graphics.deltaTime} * ${Config.SPEED} $positionX")
+    }
+
+    fun moveUp() {
+        positionY += Gdx.graphics.deltaTime * Config.SPEED
+    }
+
+    fun moveDown() {
+        positionY -= Gdx.graphics.deltaTime * Config.SPEED
+    }
+
 }

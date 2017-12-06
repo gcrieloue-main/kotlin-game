@@ -5,6 +5,9 @@ package com.gcrielou.game
  */
 object Config {
     const val SPRITE_SIZE = 16f
-    const val WORLD_WIDTH = 1080f
-    const val WORLD_HEIGHT = 720f
+
+    const val WORLD_WIDTH = 30f
+    const val WORLD_HEIGHT = 20f
+
+    const val SPEED = 2f
 }
