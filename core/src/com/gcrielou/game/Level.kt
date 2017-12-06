@@ -9,7 +9,6 @@ import utils.drawSprite
  */
 public class Level(var texture: Texture) {
 
-
     enum class tileType {
         SOLID,
         VOID,
@@ -18,6 +17,22 @@ public class Level(var texture: Texture) {
 
     class Tile(var sprite: Sprite, var type: tileType = tileType.EMPTY) // sprite + behavior
 
+    companion object {
+        private const val EMPTY = "EMPTY"
+        private const val TOP_G = "TOP_G"
+        private const val BOT_G = "BOT_G"
+        private const val CBL_G = "CBL_G"
+        private const val CBR_G = "CBR_G"
+        private const val CTL_G = "CTL_G"
+        private const val CTR_G = "CTR_G"
+        private const val MID_G = "MID_G"
+        private const val RIG_G = "RIG_G"
+        private const val LEF_G = "LEF_G"
+        private const val ROCK1 = "ROCK1"
+        private const val ROCK2 = "ROCK2"
+        private const val MUSH1 = "MUSH1"
+        private const val MUSH2 = "MUSH2"
+    }
 
     var tileCTL = Tile(Sprite(0, 0))
     var tileT = Tile(Sprite(0, 1))
@@ -32,54 +47,68 @@ public class Level(var texture: Texture) {
     var tileCBL = Tile(Sprite(4, 0))
 
     var tileRock = Tile(Sprite(7, 8), tileType.SOLID)
+    var tileRock2 = Tile(Sprite(8, 8), tileType.SOLID)
+    var tileMushroom = Tile(Sprite(9, 8))
+    var tileMushroom2 = Tile(Sprite(9, 7))
 
-    var tileSet: Map<String, Tile> = mapOf("T" to tileT,
-            "B" to tileB,
-            "CBL" to tileCBL,
-            "CBR" to tileCBR,
-            "CTL" to tileCTL,
-            "CTR" to tileCTR,
-            "M" to tileM,
-            "R" to tileR,
-            "L" to tileL,
-            "ROC" to tileRock)
+    var tileSet: Map<String, Tile> = mapOf(
+            TOP_G to tileT,
+            BOT_G to tileB,
+            CBL_G to tileCBL,
+            CBR_G to tileCBR,
+            CTL_G to tileCTL,
+            CTR_G to tileCTR,
+            MID_G to tileM,
+            RIG_G to tileR,
+            LEF_G to tileL,
+            ROCK1 to tileRock,
+            ROCK2 to tileRock2,
+            MUSH1 to tileMushroom,
+            MUSH2 to tileMushroom2
+    )
 
-    var level: Array<Array<String>> = arrayOf(
-            arrayOf("CTL", "T", "T", "T", "T", "T", "T", "T", "T", "CTR"),
-            arrayOf("L", "M", "M", "M", "M", "M", "M", "M", "M", "R"),
-            arrayOf("CBL", "B", "B", "B", "B", "B", "B", "B", "B", "CBR")
+
+    var levelLayer: Array<Array<String>> = arrayOf(
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTL_G, TOP_G, CTR_G),
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY, CBL_G, BOT_G, CBR_G),
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY),
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY),
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MID_G, EMPTY, EMPTY, EMPTY),
+            arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, CTR_G),
+            arrayOf(LEF_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
+            arrayOf(CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G)
 
     )
 
-    var elements: Array<Array<String>> = arrayOf(
-            arrayOf("", "", "", "", "", "", "", "", "", ""),
-            arrayOf("", "", "", "", "", "ROC", "", "", "", ""),
-            arrayOf("", "", "", "", "", "", "", "", "", "")
+    var elementsLayer: Array<Array<String>> = arrayOf(
+            arrayOf(EMPTY, EMPTY, MUSH1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+            arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY, EMPTY, MUSH2, EMPTY),
+            arrayOf(EMPTY, ROCK1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
     )
 
     fun canMoveUp(x: Float, y: Float): Boolean {
         var isLastTile = false
-        if (level.size - 1 == y.toInt()) isLastTile = true
+        if (levelLayer.size - 1 == y.toInt()) isLastTile = true
         if (!isLastTile) {
             // get the type of the top tile
-            isLastTile = (getTileType(x.toInt(), level.size - 1 - y.toInt() - 1) != tileType.EMPTY)
+            isLastTile = (getTileType(x.toInt(), levelLayer.size - 1 - y.toInt() - 1) != tileType.EMPTY)
 
         }
         val remainingSpaceInTile = y.toInt() + 1 - y
-        println("$remainingSpaceInTile $isLastTile")
         return remainingSpaceInTile > 0.2 || !isLastTile
     }
 
 
     fun canMoveRight(x: Float, y: Float): Boolean {
-        if (level[y.toInt()].size == x.toInt() + 1) return false
+        if (levelLayer[y.toInt()].size == x.toInt() + 1) return false
         // get the type of the right tile
         return (getTileType((x + 1).toInt(), y.toInt()) == tileType.EMPTY)
     }
 
     fun canMoveLeft(x: Float, y: Float): Boolean {
         var isLastTile = false
-        if (x.toInt() == 0 || level[y.toInt()].size == x.toInt() - 1) isLastTile = true
+        if (x.toInt() == 0 || levelLayer[y.toInt()].size == x.toInt() - 1) isLastTile = true
         if (!isLastTile) {
             // get the type of the left tile
             isLastTile = (getTileType((x - 1).toInt(), y.toInt()) != tileType.EMPTY)
@@ -101,14 +130,19 @@ public class Level(var texture: Texture) {
     }
 
     private fun getTileType(x: Int, y: Int): tileType? {
-        val line = level.get(y)
-        val tileStringRepresentation = line.get(x)
-        val tile: Tile? = tileSet.get(tileStringRepresentation)
-        return tile?.type
+        val tileElementsStringRepresentation = elementsLayer.get(y).get(x)
+        if (tileElementsStringRepresentation.isNotEmpty()) {
+            val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
+            return tileElements?.type
+        }
+
+        val tileLevelStringRepresentation = levelLayer.get(y).get(x)
+        val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
+        return tileLevel?.type
     }
 
     fun draw(batch: Batch) {
-        for ((rowIndex, row) in level.reversed().withIndex()) {
+        for ((rowIndex, row) in levelLayer.reversed().withIndex()) {
             for ((colIndex, col) in row.withIndex()) {
                 if (col.isNotEmpty()) {
                     val x = tileSet.get(col)?.sprite?.y ?: 0
@@ -121,7 +155,7 @@ public class Level(var texture: Texture) {
             }
         }
 
-        for ((rowIndex, row) in elements.reversed().withIndex()) {
+        for ((rowIndex, row) in elementsLayer.reversed().withIndex()) {
             for ((colIndex, col) in row.withIndex()) {
                 if (col.isNotEmpty()) {
                     val x = tileSet.get(col)?.sprite?.y ?: 0
