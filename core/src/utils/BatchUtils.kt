@@ -10,9 +10,9 @@ import com.gcrielou.game.Config
 
 inline fun Batch.drawSprite(texture: Texture, x: Int, y: Int, spriteSize: Float, spriteX: Int, spriteY: Int, flipX: Boolean = false, flipY: Boolean = false) {
     draw(texture,
-            x.toFloat(), y.toFloat(), // world coordinates
+            x.toFloat() * Config.SPRITE_SIZE_WORLD_UNIT, y.toFloat() * Config.SPRITE_SIZE_WORLD_UNIT, // world coordinates
             1f, 1f, // world origins
-            1f, 1f, // world dimensions
+            Config.SPRITE_SIZE_WORLD_UNIT, Config.SPRITE_SIZE_WORLD_UNIT, // world dimensions
             1f, 1f, // scale
             0f,
             spriteSize.toInt() * spriteX, spriteSize.toInt() * spriteY, //src coordinates
@@ -24,7 +24,7 @@ inline fun Batch.drawSprite(texture: Texture, x: Float, y: Float, spriteSize: Fl
     draw(texture,
             x, y, // world coordinates
             0f, 0f, // world origins
-            1f, 1f, // world dimensions
+            Config.SPRITE_SIZE_WORLD_UNIT, Config.SPRITE_SIZE_WORLD_UNIT, // world dimensions
             1f, 1f, // scale
             0f,
             spriteSize.toInt() * spriteX, spriteSize.toInt() * spriteY, //src coordinates

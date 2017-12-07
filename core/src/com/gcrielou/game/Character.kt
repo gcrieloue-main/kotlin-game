@@ -13,12 +13,12 @@ class Character() {
     var currentState = "IDLE"
     private var lastState = "RUNNING"
 
-    var positionX = 2f
-    var positionY = 1f
+    var positionX = 2f * Config.SPRITE_SIZE_WORLD_UNIT
+    var positionY = 1f * Config.SPRITE_SIZE_WORLD_UNIT
 
     private var lastAnimationDrawing: Float = 0f
     private var currentSprite = 1
-    private var animationSpeed = 0.1
+    private var animationSpeed = Config.ANIMATION_SPEED
 
     var statesSprites: Map<String, Array<Sprite>> = mapOf(
             "RUNNING" to arrayOf(Sprite(9, 1), Sprite(9, 2), Sprite(9, 3)),
@@ -55,20 +55,21 @@ class Character() {
                 flipX = sprite?.flipX ?: false)
     }
 
-    fun moveLeft() {
-        positionX -= Gdx.graphics.deltaTime * Config.SPEED
+    fun moveLeft(distance: Float) {
+        positionX -= distance
     }
 
-    fun moveRight() {
-        positionX += Gdx.graphics.deltaTime * Config.SPEED
+    fun moveRight(distance: Float) {
+        positionX += distance
     }
 
-    fun moveUp() {
-        positionY += Gdx.graphics.deltaTime * Config.SPEED
+    fun moveUp(distance: Float) {
+        positionY += distance
     }
 
-    fun moveDown() {
-        positionY -= Gdx.graphics.deltaTime * Config.SPEED
+    fun moveDown(distance: Float) {
+        positionY -= distance
     }
 
+    fun computePlayerMoveLength() = Gdx.graphics.deltaTime * Config.PLAYER_SPEED
 }

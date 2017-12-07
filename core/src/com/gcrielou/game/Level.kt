@@ -2,7 +2,8 @@ package com.gcrielou.game;
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
-import utils.drawSprite
+import utils.*
+import kotlin.math.ceil
 
 /**
  * Created by gcrielou on 05/12/2017.
@@ -124,69 +125,40 @@ class Level(var texture: Texture) {
         elementsLayer = elementsLayer.reversedArray()
     }
 
-    fun canMoveUp(x: Float, y: Float): Boolean {
-        var isLastTile = false
-        if (levelLayer.size - 1 == y.toInt()) isLastTile = true
-        if (!isLastTile) {
-            // get the type of the top tile
-            isLastTile = (getTileType(x.toInt(), y.toInt() + 1) != tileType.EMPTY)
 
-        }
-        val remainingSpaceInTile = y.toInt() + 1 - y
-        return remainingSpaceInTile > 0.1 || !isLastTile
-    }
+    fun canMoveRight(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT + distance, y) == tileType.EMPTY)
 
+    fun canMoveLeft(x: Float, y: Float, distance: Float): Boolean = (getTileType(x - distance, y) == tileType.EMPTY)
 
-    fun canMoveRight(x: Float, y: Float): Boolean {
-        if (levelLayer[y.toInt()].size == x.toInt() + 1) return false
-        // get the type of the right tile
-        return (getTileType((x + 1).toInt(), y.toInt()) == tileType.EMPTY)
-    }
+    fun canMoveUp(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT / 2, y + distance) == tileType.EMPTY)
 
-    fun canMoveLeft(x: Float, y: Float): Boolean {
-        var isLastTile = false
-        if (x.toInt() == 0 || levelLayer[y.toInt()].size == x.toInt() - 1) isLastTile = true
-        if (!isLastTile) {
-            // get the type of the left tile
-            isLastTile = (getTileType((x - 1).toInt(), y.toInt()) != tileType.EMPTY)
-        }
-        val remainingSpaceInTile = x - x.toInt()
-        return remainingSpaceInTile > 0.1 || !isLastTile
-    }
+    fun canMoveDown(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT / 2, y - distance) == tileType.EMPTY)
 
-    fun canMoveDown(x: Float, y: Float): Boolean {
-        var isLastTile = false
-        if (y.toInt() == 0) isLastTile = true
-        if (!isLastTile) {
-            // get the type of the bottom tile
-            isLastTile = (getTileType(x.toInt(), y.toInt() - 1) != tileType.EMPTY)
-        }
-        val remainingSpaceInTile = y - y.toInt()
-        println("$remainingSpaceInTile $isLastTile ${remainingSpaceInTile > 0.2} ${!isLastTile}")
-        return remainingSpaceInTile > 0.2 || !isLastTile
-    }
+    private fun getTileType(x: Float, y: Float): tileType? {
 
-    private fun getTileType(x: Int, y: Int): tileType? {
-        if (y < elementsLayer.size) {
-            val row = elementsLayer.get(y)
-            if (x < row.size) {
-                val tileElementsStringRepresentation = row.get(x)
+        var tileCoordX = (x.toSpriteUnits()).floor()
+        var tileCoordY = (y.toSpriteUnits()).floor()
+
+        if (tileCoordY >= 0 && tileCoordY < elementsLayer.size) {
+            val row = elementsLayer.get(tileCoordY)
+            if (tileCoordX >= 0 && tileCoordX < row.size) {
+                val tileElementsStringRepresentation = row.get(tileCoordX)
                 if (tileElementsStringRepresentation.isNotEmpty()) {
                     val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
                     val type = tileElements?.type
-                    println("element type ($x, $y) : ${tileElements?.type}")
                     if (type != tileType.EMPTY)
                         return type
                 }
             }
         }
 
-        val row = levelLayer.get(y)
-        if (x < row.size) {
-            val tileLevelStringRepresentation = row.get(x)
-            val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
-            println("level type ($x, $y) : ${tileLevel?.type}")
-            return tileLevel?.type
+        if (tileCoordY >= 0 && tileCoordY < levelLayer.size) {
+            val row = levelLayer.get(tileCoordY)
+            if (tileCoordX >= 0 && tileCoordX < row.size) {
+                val tileLevelStringRepresentation = row.get(tileCoordX)
+                val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
+                return tileLevel?.type
+            }
         }
 
         return null

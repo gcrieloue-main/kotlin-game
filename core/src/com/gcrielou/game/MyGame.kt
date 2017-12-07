@@ -7,31 +7,32 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.FitViewport
-import utils.clearScreen
-import utils.use
+import utils.*
+import java.util.logging.FileHandler
 
-/**
- * Created by gilles on 03-Dec-17.
- */
 class MyGame : GameBase() {
 
     lateinit var batch: SpriteBatch
-    lateinit var img: Texture
-    lateinit var camera: OrthographicCamera
-    lateinit var viewport: FitViewport
-    lateinit var renderer: ShapeRenderer
+    private lateinit var img: Texture
+    private lateinit var camera: OrthographicCamera
+    private lateinit var viewport: FitViewport
+    private lateinit var renderer: ShapeRenderer
+    private lateinit var font: BitmapFont
 
-    lateinit var music: Music
-    lateinit var walkSound: Sound
+    private lateinit var music: Music
+    private lateinit var walkSound: Sound
 
-    var character: Character = Character()
+    private var character: Character = Character()
     lateinit var level: Level
 
-    var displayGrid = false
-    var hasSound = false
+    private var displayGrid = false
+    private var displayCoords = false
+    private var hasSound = false
 
     override fun create() {
         batch = SpriteBatch()
@@ -42,6 +43,12 @@ class MyGame : GameBase() {
         renderer = ShapeRenderer()
         Gdx.input.inputProcessor = this
 
+        val generator = FreeTypeFontGenerator(FileHandle("OpenSans-Regular.ttf"))
+        val param = FreeTypeFontGenerator.FreeTypeFontParameter()
+        param.size = 16
+        font = generator.generateFont(param)
+        generator.dispose()
+
         music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
         walkSound = Gdx.audio.newSound(FileHandle("sfx_step_grass_l.mp3"))
     }
@@ -49,64 +56,59 @@ class MyGame : GameBase() {
     override fun render() {
         clearScreen()
         batch.projectionMatrix = camera.combined
-        batch.use { draw() }
+
+        batch.use {
+            draw()
+        }
 
         if (displayGrid) {
             drawGrid()
         }
     }
 
+
     override fun resize(width: Int, height: Int) {
         viewport.update(width, height, true)
     }
 
     private fun draw() {
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        val distance: Float = character.computePlayerMoveLength()
+        if (Input.Keys.DOWN.isKeyPressed()) {
             character.currentState = "RUNNING"
-            if (level.canMoveDown(character.positionX, character.positionY))
-                character.moveDown()
+            if (level.canMoveDown(character.positionX, character.positionY, distance))
+                character.moveDown(distance)
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (Input.Keys.UP.isKeyPressed()) {
             character.currentState = "RUNNING"
-            if (level.canMoveUp(character.positionX, character.positionY))
-                character.moveUp()
+            if (level.canMoveUp(character.positionX, character.positionY, distance))
+                character.moveUp(distance)
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (Input.Keys.RIGHT.isKeyPressed()) {
             character.currentState = "RUNNING"
-            if (level.canMoveRight(character.positionX, character.positionY))
-                character.moveRight()
+            if (level.canMoveRight(character.positionX, character.positionY, distance))
+                character.moveRight(distance)
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if (Input.Keys.LEFT.isKeyPressed()) {
             character.currentState = "RUNNING_LEFT"
-            if (level.canMoveLeft(character.positionX, character.positionY))
-                character.moveLeft()
+            if (level.canMoveLeft(character.positionX, character.positionY, distance))
+                character.moveLeft(distance)
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+        if (Input.Keys.SPACE.isKeyPressed()) {
             character.currentState = "JUMP"
         }
 
         level.draw(batch)
         character.drawCharacter(batch, img)
+
+        if (displayCoords) {
+            drawCoords()
+        }
     }
 
-    private fun drawGrid() {
-        renderer.projectionMatrix = camera.combined
-        renderer.begin(ShapeRenderer.ShapeType.Line)
-        renderer.color = Color.WHITE
-
-        for (y in 0..Config.WORLD_HEIGHT.toInt()) {
-            renderer.line(0f, y.toFloat(), Config.WORLD_WIDTH, y.toFloat())
-        }
-
-        for (x in 0..Config.WORLD_WIDTH.toInt()) {
-            renderer.line(x.toFloat(), 0f, x.toFloat(), Config.WORLD_HEIGHT)
-        }
-
-        renderer.end()
-    }
 
     override fun keyDown(keycode: Int): Boolean {
         when (keycode) {
+            Input.Keys.P->displayCoords = !displayCoords
             Input.Keys.ENTER -> displayGrid = !displayGrid
             Input.Keys.M -> {
                 hasSound = !hasSound
@@ -128,7 +130,36 @@ class MyGame : GameBase() {
         renderer.dispose()
         music.dispose()
         walkSound.dispose()
+        font.dispose()
     }
 
+    private fun drawGrid() {
+        renderer.projectionMatrix = camera.combined
+        renderer.begin(ShapeRenderer.ShapeType.Line)
+        renderer.color = Color.WHITE
 
+        for (y in 0..Config.WORLD_HEIGHT.toInt()) {
+            renderer.line(0f, y.toFloat() * Config.SPRITE_SIZE_WORLD_UNIT, Config.WORLD_WIDTH, y.toFloat() * Config.SPRITE_SIZE_WORLD_UNIT)
+        }
+
+        for (x in 0..Config.WORLD_WIDTH.toInt()) {
+            renderer.line(x.toFloat() * Config.SPRITE_SIZE_WORLD_UNIT, 0f, x.toFloat() * Config.SPRITE_SIZE_WORLD_UNIT, Config.WORLD_HEIGHT)
+        }
+
+        renderer.end()
+    }
+
+    private fun drawCoords() {
+        if (displayCoords) {
+            font.draw(batch,
+                    "${(character.positionX.toSpriteUnits().floor())},${(character.positionY.toSpriteUnits().floor())} (Sprites floor)",
+                    Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 20f)
+            font.draw(batch,
+                    "${(character.positionX.toSpriteUnits())},${(character.positionY.toSpriteUnits())} (Sprites)",
+                    Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 40f)
+            font.draw(batch,
+                    "${character.positionX},${character.positionY} (World Units)",
+                    Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 60f)
+        }
+    }
 }
