@@ -99,13 +99,14 @@ class Level(var texture: Texture) {
         levelLayer = arrayOf(
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTL_G, TOP_G, CTR_G),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTWAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, FLOA1, FLOA2, FLOA3, CBL_G, BOT_G, CBR_G),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, FLOA2, FLOA2, FLOA2, CBL_G, BOT_G, CBR_G),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
                 arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, MID_G, TOP_G, TOP_G, CTR_G),
                 arrayOf(CBL_G, CBLFG, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
-                arrayOf(EMPTY, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G)
+                arrayOf(FLOA2, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G),
+                arrayOf(EMPTY, FLOA1, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA3)
         )
 
         elementsLayer = arrayOf(
@@ -117,6 +118,7 @@ class Level(var texture: Texture) {
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
                 arrayOf(EMPTY, EMPTY, MUSH1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY, EMPTY, MUSH2, EMPTY),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
         )
 
@@ -139,25 +141,26 @@ class Level(var texture: Texture) {
         var tileCoordX = (x.toSpriteUnits()).floor()
         var tileCoordY = (y.toSpriteUnits()).floor()
 
-        if (tileCoordY >= 0 && tileCoordY < elementsLayer.size) {
-            val row = elementsLayer.get(tileCoordY)
-            if (tileCoordX >= 0 && tileCoordX < row.size) {
-                val tileElementsStringRepresentation = row.get(tileCoordX)
-                if (tileElementsStringRepresentation.isNotEmpty()) {
-                    val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
-                    val type = tileElements?.type
-                    if (type != tileType.EMPTY)
-                        return type
-                }
-            }
+        val elementTileType = getTileType(elementsLayer, tileCoordX, tileCoordY)
+        if (elementTileType != null && elementTileType != tileType.EMPTY) {
+            return elementTileType
         }
 
-        if (tileCoordY >= 0 && tileCoordY < levelLayer.size) {
-            val row = levelLayer.get(tileCoordY)
-            if (tileCoordX >= 0 && tileCoordX < row.size) {
-                val tileLevelStringRepresentation = row.get(tileCoordX)
-                val tileLevel: Tile? = tileSet.get(tileLevelStringRepresentation)
-                return tileLevel?.type
+        val levelTileType = getTileType(levelLayer, tileCoordX, tileCoordY)
+
+        return levelTileType
+    }
+
+    private fun getTileType(level: Array<Array<String>>, x: Int, y: Int): tileType? {
+
+        if (y >= 0 && y < level.size) {
+            val row = level.get(y)
+            if (x >= 0 && x < row.size) {
+                val tileElementsStringRepresentation = row.get(x)
+                if (tileElementsStringRepresentation.isNotEmpty()) {
+                    val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
+                    return tileElements?.type
+                }
             }
         }
 

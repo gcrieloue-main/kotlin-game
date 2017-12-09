@@ -2,7 +2,6 @@ package com.gcrielou.game
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.audio.Music
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -13,31 +12,35 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.FitViewport
 import utils.*
-import java.util.logging.FileHandler
 
 class MyGame : GameBase() {
 
     lateinit var batch: SpriteBatch
-    private lateinit var img: Texture
+    private lateinit var spritesCharacter: Texture
+    private lateinit var spritesEnv: Texture
+    private lateinit var spritesEnemy: Texture
     private lateinit var camera: OrthographicCamera
     private lateinit var viewport: FitViewport
     private lateinit var renderer: ShapeRenderer
     private lateinit var font: BitmapFont
 
     private lateinit var music: Music
-    private lateinit var walkSound: Sound
+    private lateinit var walkSound: Music
 
     private var character: Character = Character()
+    private var enemy: Enemy = Enemy()
     lateinit var level: Level
 
     private var displayGrid = false
     private var displayCoords = false
-    private var hasSound = false
+    private var hasMusic = false
 
     override fun create() {
         batch = SpriteBatch()
-        img = Texture("char_sprites.png")
-        level = Level(Texture("env_sprites.png"))
+        spritesCharacter = Texture("char_sprites.png")
+        spritesEnv = Texture("env_sprites.png")
+        spritesEnemy = Texture("zombies_and_skeletons.png")
+        level = Level(spritesEnv)
         camera = OrthographicCamera()
         viewport = FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera)
         renderer = ShapeRenderer()
@@ -49,10 +52,23 @@ class MyGame : GameBase() {
         font = generator.generateFont(param)
         generator.dispose()
 
-        music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
-        walkSound = Gdx.audio.newSound(FileHandle("sfx_step_grass_l.mp3"))
+        setSounds()
+
+        if (hasMusic) {
+            music.play()
+        }
     }
 
+    private fun setSounds() {
+        music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
+        music.volume = 0.7f
+        walkSound = Gdx.audio.newMusic(FileHandle("sfx_step_grass_l.mp3"))
+        walkSound.volume = 0.2f
+    }
+
+    /*
+    Called 60 times/second
+     */
     override fun render() {
         clearScreen()
         batch.projectionMatrix = camera.combined
@@ -72,6 +88,51 @@ class MyGame : GameBase() {
     }
 
     private fun draw() {
+        handleKeys()
+
+        level.draw(batch)
+        enemy.drawCharacter(batch, spritesEnemy)
+
+        if (character.isAlive())
+            character.drawCharacter(batch, spritesCharacter)
+
+        handleEnemyBehavior()
+
+        if (displayCoords) {
+            drawCoords()
+        }
+    }
+
+    private fun handleEnemyBehavior() {
+        val distanceEnemy = distance(Pair(character.positionX, character.positionY), Pair(enemy.positionX, enemy.positionY))
+        if (distanceEnemy.toSpriteUnits() < 3) {
+            val enemyMoveLength = enemy.computeMoveLength()
+            if (character.positionX < enemy.positionX) {
+                if (level.canMoveLeft(enemy.positionX, enemy.positionY, enemyMoveLength)) {
+                    enemy.moveLeft(enemyMoveLength)
+                }
+            } else if (character.positionX > enemy.positionX) {
+                if (level.canMoveRight(enemy.positionX, enemy.positionY, enemyMoveLength)) {
+                    enemy.moveRight(enemyMoveLength)
+                }
+            }
+            if (character.positionY > enemy.positionY) {
+                if (level.canMoveUp(enemy.positionX, enemy.positionY, enemyMoveLength)) {
+                    enemy.moveUp(enemyMoveLength)
+                }
+            } else if (character.positionY < enemy.positionY) {
+                if (level.canMoveDown(enemy.positionX, enemy.positionY, enemyMoveLength)) {
+                    enemy.moveDown(enemyMoveLength)
+                }
+            }
+        }
+
+        if (distanceEnemy.toSpriteUnits() < 1) {
+            character.loseHealth()
+        }
+    }
+
+    private fun handleKeys() {
         val distance: Float = character.computePlayerMoveLength()
         if (Input.Keys.DOWN.isKeyPressed()) {
             character.currentState = "RUNNING"
@@ -96,22 +157,20 @@ class MyGame : GameBase() {
         if (Input.Keys.SPACE.isKeyPressed()) {
             character.currentState = "JUMP"
         }
-
-        level.draw(batch)
-        character.drawCharacter(batch, img)
-
-        if (displayCoords) {
-            drawCoords()
+        if (Input.Keys.ALT_LEFT.isKeyPressed()) {
+            character.currentState = "FIGHT"
+        }
+        if (character.currentState.startsWith("RUNNING") && !walkSound.isPlaying) {
+            walkSound.play()
         }
     }
 
-
     override fun keyDown(keycode: Int): Boolean {
         when (keycode) {
-            Input.Keys.P->displayCoords = !displayCoords
+            Input.Keys.P -> displayCoords = !displayCoords
             Input.Keys.ENTER -> displayGrid = !displayGrid
             Input.Keys.M -> {
-                hasSound = !hasSound
+                hasMusic = !hasMusic
                 if (music.isPlaying) music.pause()
                 else music.play()
             }
@@ -126,7 +185,8 @@ class MyGame : GameBase() {
 
     override fun dispose() {
         batch.dispose()
-        img.dispose()
+        spritesCharacter.dispose()
+        spritesEnv.dispose()
         renderer.dispose()
         music.dispose()
         walkSound.dispose()

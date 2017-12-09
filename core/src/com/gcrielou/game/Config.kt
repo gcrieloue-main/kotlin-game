@@ -12,6 +12,7 @@ object Config {
     const val SPRITE_SIZE_WORLD_UNIT = 32f
 
     const val PLAYER_SPEED = 2f * SPRITE_SIZE_WORLD_UNIT
+    const val ENEMY_SPEED = 1f * SPRITE_SIZE_WORLD_UNIT
 
     const val ANIMATION_SPEED = 0.1f
 }
