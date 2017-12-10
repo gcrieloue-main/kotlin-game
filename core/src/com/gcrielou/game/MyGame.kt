@@ -17,6 +17,7 @@ class MyGame : GameBase() {
 
     lateinit var batch: SpriteBatch
     private lateinit var spritesCharacter: Texture
+    private lateinit var spritesCubicMonster: Texture
     private lateinit var spritesEnv: Texture
     private lateinit var spritesEnemy: Texture
     private lateinit var camera: OrthographicCamera
@@ -26,10 +27,14 @@ class MyGame : GameBase() {
 
     private lateinit var music: Music
     private lateinit var walkSound: Music
+    private lateinit var gruntSound: Music
+    private lateinit var monsterGruntSound: Music
+    private lateinit var monsterGruntSound2: Music
+    private lateinit var monsterGruntSound3: Music
 
-    private var character: Character = Character()
-    private var enemy: Enemy = Enemy()
+    lateinit var player: Player
     lateinit var level: Level
+    lateinit var enemies: List<Character>
 
     private var displayGrid = false
     private var displayCoords = false
@@ -40,11 +45,19 @@ class MyGame : GameBase() {
         spritesCharacter = Texture("char_sprites.png")
         spritesEnv = Texture("env_sprites.png")
         spritesEnemy = Texture("zombies_and_skeletons.png")
+        spritesCubicMonster = Texture("cubic_monsters.png")
         level = Level(spritesEnv)
         camera = OrthographicCamera()
         viewport = FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera)
         renderer = ShapeRenderer()
         Gdx.input.inputProcessor = this
+
+        enemies = listOf(
+                Enemy(spritesEnemy, 11, 13),
+                CubicMonster(spritesCubicMonster, 6, 3),
+                CubicMonster(spritesCubicMonster, 8, 2)
+        )
+        player = Player(spritesCharacter)
 
         val generator = FreeTypeFontGenerator(FileHandle("OpenSans-Regular.ttf"))
         val param = FreeTypeFontGenerator.FreeTypeFontParameter()
@@ -62,8 +75,16 @@ class MyGame : GameBase() {
     private fun setSounds() {
         music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
         music.volume = 0.7f
-        walkSound = Gdx.audio.newMusic(FileHandle("sfx_step_grass_l.mp3"))
+        walkSound = Gdx.audio.newMusic(FileHandle("player/sfx_step_grass_l.mp3"))
         walkSound.volume = 0.2f
+        gruntSound = Gdx.audio.newMusic(FileHandle("player/gruntsound.wav"))
+        gruntSound.volume = 0.2f
+        monsterGruntSound = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound01.wav"))
+        monsterGruntSound2 = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound02.wav"))
+        monsterGruntSound3 = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound03.wav"))
+        monsterGruntSound.volume = 0.2f
+        monsterGruntSound2.volume = 0.2f
+        monsterGruntSound3.volume = 0.2f
     }
 
     /*
@@ -91,76 +112,131 @@ class MyGame : GameBase() {
         handleKeys()
 
         level.draw(batch)
-        enemy.drawCharacter(batch, spritesEnemy)
 
-        if (character.isAlive())
-            character.drawCharacter(batch, spritesCharacter)
+        if (player.isAlive())
+            player.drawCharacter(batch)
 
-        handleEnemyBehavior()
+        drawEnemies()
 
         if (displayCoords) {
             drawCoords()
         }
+
+        if (spritesStack.size > 0) {
+            val positionedSprite = spritesStack.removeAt(0)
+            println(listOf<Any>(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
+                    Config.SPRITE_SIZE,
+                    "x:" + positionedSprite.sprite.x, "y:" + positionedSprite.sprite.y).joinToString(" - "))
+            batch.drawSprite(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
+                    Config.SPRITE_SIZE,
+                    positionedSprite.sprite.x, positionedSprite.sprite.y)
+        }
     }
 
-    private fun handleEnemyBehavior() {
-        val distanceEnemy = distance(Pair(character.positionX, character.positionY), Pair(enemy.positionX, enemy.positionY))
-        if (distanceEnemy.toSpriteUnits() < 3) {
+    fun drawEnemies() {
+        for (enemy in enemies) {
+
+            if (enemy.isAlive())
+                enemy.drawCharacter(batch)
+
+            if (enemy.isAlive())
+                handleEnemyBehavior(enemy)
+
+        }
+    }
+
+    class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
+
+    var spritesStack: MutableList<PositionedSprite> = mutableListOf()
+
+    private fun handleEnemyBehavior(enemy: Character) {
+        val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
+        if (distanceEnemy.toSpriteUnits() < 3 && distanceEnemy.toSpriteUnits() >= 0.8) {
             val enemyMoveLength = enemy.computeMoveLength()
-            if (character.positionX < enemy.positionX) {
+            if (player.positionX < enemy.positionX) {
                 if (level.canMoveLeft(enemy.positionX, enemy.positionY, enemyMoveLength)) {
                     enemy.moveLeft(enemyMoveLength)
                 }
-            } else if (character.positionX > enemy.positionX) {
+            } else if (player.positionX > enemy.positionX) {
                 if (level.canMoveRight(enemy.positionX, enemy.positionY, enemyMoveLength)) {
                     enemy.moveRight(enemyMoveLength)
                 }
             }
-            if (character.positionY > enemy.positionY) {
+            if (player.positionY > enemy.positionY) {
                 if (level.canMoveUp(enemy.positionX, enemy.positionY, enemyMoveLength)) {
                     enemy.moveUp(enemyMoveLength)
                 }
-            } else if (character.positionY < enemy.positionY) {
+            } else if (player.positionY < enemy.positionY) {
                 if (level.canMoveDown(enemy.positionX, enemy.positionY, enemyMoveLength)) {
                     enemy.moveDown(enemyMoveLength)
                 }
             }
+        } else {
+            enemy.hold()
         }
 
-        if (distanceEnemy.toSpriteUnits() < 1) {
-            character.loseHealth()
+        if (player.isAlive() && distanceEnemy.toSpriteUnits() < 1) {
+            player.loseHealth()
+            if (!gruntSound.isPlaying)
+                gruntSound.play()
         }
     }
 
+    private var lastAttackTime: Float = 0f
+
     private fun handleKeys() {
-        val distance: Float = character.computePlayerMoveLength()
+        val distance: Float = player.computePlayerMoveLength()
         if (Input.Keys.DOWN.isKeyPressed()) {
-            character.currentState = "RUNNING"
-            if (level.canMoveDown(character.positionX, character.positionY, distance))
-                character.moveDown(distance)
+            if (level.canMoveDown(player.positionX, player.positionY, distance))
+                player.moveDown(distance)
         }
         if (Input.Keys.UP.isKeyPressed()) {
-            character.currentState = "RUNNING"
-            if (level.canMoveUp(character.positionX, character.positionY, distance))
-                character.moveUp(distance)
+            if (level.canMoveUp(player.positionX, player.positionY, distance))
+                player.moveUp(distance)
         }
         if (Input.Keys.RIGHT.isKeyPressed()) {
-            character.currentState = "RUNNING"
-            if (level.canMoveRight(character.positionX, character.positionY, distance))
-                character.moveRight(distance)
+            if (level.canMoveRight(player.positionX, player.positionY, distance))
+                player.moveRight(distance)
         }
         if (Input.Keys.LEFT.isKeyPressed()) {
-            character.currentState = "RUNNING_LEFT"
-            if (level.canMoveLeft(character.positionX, character.positionY, distance))
-                character.moveLeft(distance)
+            if (level.canMoveLeft(player.positionX, player.positionY, distance))
+                player.moveLeft(distance)
         }
         if (Input.Keys.SPACE.isKeyPressed()) {
-            character.currentState = "JUMP"
+            player.currentState = "JUMP"
         }
         if (Input.Keys.ALT_LEFT.isKeyPressed()) {
-            character.currentState = "FIGHT"
+            lastAttackTime += Gdx.graphics.deltaTime
+            if (lastAttackTime > 0.2) {
+                lastAttackTime = 0f
+
+                player.currentState = "FIGHT"
+                for (enemy in enemies) {
+                    if (enemy.isAlive()) {
+                        val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
+                        if (distanceEnemy.toSpriteUnits() < 2) {
+                            enemy.loseHealth()
+
+                            if (Math.random() > 0.5)
+                                monsterGruntSound.play()
+                            else if ((Math.random() > 0.7)) monsterGruntSound2.play()
+                            else monsterGruntSound3.play()
+                        }
+                    }
+                }
+
+                // try sword animation
+                var x = player.positionX + Config.SPRITE_SIZE_WORLD_UNIT * 2 / 3
+                var y = player.positionY + Config.SPRITE_SIZE_WORLD_UNIT / 3
+                spritesStack.add(PositionedSprite(Sprite(0, 2), x, y, spritesCubicMonster))
+                spritesStack.add(PositionedSprite(Sprite(1, 2), x, y, spritesCubicMonster))
+                spritesStack.add(PositionedSprite(Sprite(2, 2), x, y, spritesCubicMonster))
+                spritesStack.add(PositionedSprite(Sprite(3, 2), x, y, spritesCubicMonster))
+            }
+
         }
-        if (character.currentState.startsWith("RUNNING") && !walkSound.isPlaying) {
+
+        if (player.isAlive() && player.currentState.startsWith("RUNNING") && !walkSound.isPlaying) {
             walkSound.play()
         }
     }
@@ -179,7 +255,7 @@ class MyGame : GameBase() {
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        character.currentState = "IDLE"
+        player.currentState = "IDLE"
         return false
     }
 
@@ -212,13 +288,13 @@ class MyGame : GameBase() {
     private fun drawCoords() {
         if (displayCoords) {
             font.draw(batch,
-                    "${(character.positionX.toSpriteUnits().floor())},${(character.positionY.toSpriteUnits().floor())} (Sprites floor)",
+                    "${(player.positionX.toSpriteUnits().floor())},${(player.positionY.toSpriteUnits().floor())} (Sprites floor)",
                     Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 20f)
             font.draw(batch,
-                    "${(character.positionX.toSpriteUnits())},${(character.positionY.toSpriteUnits())} (Sprites)",
+                    "${(player.positionX.toSpriteUnits())},${(player.positionY.toSpriteUnits())} (Sprites)",
                     Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 40f)
             font.draw(batch,
-                    "${character.positionX},${character.positionY} (World Units)",
+                    "${player.positionX},${player.positionY} (World Units)",
                     Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 60f)
         }
     }

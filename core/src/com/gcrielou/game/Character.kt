@@ -8,7 +8,15 @@ import utils.drawSprite
 /**
  * Created by gcrielou on 05/12/2017.
  */
-class Character() {
+open class Character(var texture: Texture) {
+
+    enum class Orientation {
+        UP,
+        LEFT,
+        DOWN,
+        RIGHT,
+        NONE
+    }
 
     var currentState = "IDLE"
     private var lastState = "RUNNING"
@@ -20,18 +28,20 @@ class Character() {
     private var currentSprite = 1
     private var animationSpeed = Config.ANIMATION_SPEED
 
-    private var health = 5
+    var orientation: Orientation = Orientation.NONE
+
+    open var health = 5
     var secondsSinceLastHealthLost = 0f
 
-    var statesSprites: Map<String, Array<Sprite>> = mapOf(
-            "RUNNING" to arrayOf(Sprite(9, 1), Sprite(9, 2), Sprite(9, 3)),
-            "RUNNING_LEFT" to arrayOf(Sprite(9, 1, flipX = true), Sprite(9, 2, flipX = true), Sprite(9, 3, flipX = true)),
-            "IDLE" to arrayOf(Sprite(7, 1), Sprite(7, 2), Sprite(7, 3), Sprite(7, 3)),
+    open var statesSprites: Map<String, Array<Sprite>> = mapOf(
+            "RUNNING" to arrayOf(Sprite(1, 9), Sprite(2, 9), Sprite(3, 9)),
+            "RUNNING_LEFT" to arrayOf(Sprite(1, 9, flipX = true), Sprite(2, 9, flipX = true), Sprite(9, 3, flipX = true)),
+            "IDLE" to arrayOf(Sprite(1, 7), Sprite(2, 7), Sprite(3, 7), Sprite(7, 3)),
             "JUMP" to arrayOf(Sprite(12, 1), Sprite(12, 2)),
-            "FIGHT" to arrayOf(Sprite(3, 1), Sprite(3, 2), Sprite(3, 3), Sprite(3, 4))
+            "FIGHT" to arrayOf(Sprite(1, 3), Sprite(2, 3), Sprite(3, 3), Sprite(4, 3))
     )
 
-    fun drawCharacter(batch: Batch, img: Texture) {
+    fun drawCharacter(batch: Batch) {
 
         // change state, reset sprite animation
         if (currentState != lastState) {
@@ -47,35 +57,47 @@ class Character() {
 
         if (lastAnimationDrawing >= animationSpeed) {
             val nbSprites = sprites?.size ?: 0
-            currentSprite = (currentSprite + 1) % nbSprites
-            lastAnimationDrawing = 0f
+            if (nbSprites > 0) {
+                currentSprite = (currentSprite + 1) % nbSprites
+                lastAnimationDrawing = 0f
+            }
         }
 
         val sprite = sprites?.get(currentSprite)
-        batch.drawSprite(img, positionX, positionY,
+        batch.drawSprite(texture, positionX, positionY,
                 Config.SPRITE_SIZE,
-                sprite?.y ?: 0,
                 sprite?.x ?: 0,
+                sprite?.y ?: 0,
                 flipX = sprite?.flipX ?: false)
     }
 
     fun moveLeft(distance: Float) {
+        currentState = "RUNNING_LEFT"
         positionX -= distance
+        orientation = Orientation.LEFT
     }
 
     fun moveRight(distance: Float) {
+        currentState = "RUNNING"
         positionX += distance
+    }
+
+    fun hold() {
+        currentState = "IDLE"
+        orientation = Orientation.NONE
     }
 
     fun moveUp(distance: Float) {
         positionY += distance
+        orientation = Orientation.UP
     }
 
     fun moveDown(distance: Float) {
         positionY -= distance
+        orientation = Orientation.DOWN
     }
 
-    fun computePlayerMoveLength() = Gdx.graphics.deltaTime * Config.PLAYER_SPEED
+    open fun computePlayerMoveLength() = Gdx.graphics.deltaTime * Config.PLAYER_SPEED
 
 
     fun loseHealth() {
@@ -87,4 +109,6 @@ class Character() {
     }
 
     fun isAlive() = health > 0
+
+    fun computeMoveLength() = Gdx.graphics.deltaTime * Config.ENEMY_SPEED
 }
