@@ -125,24 +125,18 @@ open class Character(var texture: Texture) {
 
             // moveX is the distance the enemy go back on playerX axis
             moveX = distanceX / distanceEnemy
-            println("distanceX=$distanceX, distanceY=$distanceY, distanceEnemy=$distanceEnemy, moveX=$moveX")
             // moveX is the distance the enemy go back on playerY axis
             moveY = Math.sqrt(1 - moveX * moveX)
         }
 
         if (playerX > positionX) moveX = -moveX
         if (playerY > positionY) moveY = -moveY
-        println("" + moveX + " " + moveY)
 
         return Pair(moveX.toFloat().toWorldUnits(), moveY.toFloat().toWorldUnits())
     }
 
     fun loseHealth() {
-        secondsSinceLastHealthLost += Gdx.graphics.deltaTime
-        if (secondsSinceLastHealthLost >= 1) {
-            health--
-            secondsSinceLastHealthLost = 0f
-        }
+        health--
     }
 
     fun isAlive() = health > 0

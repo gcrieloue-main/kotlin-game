@@ -40,6 +40,7 @@ class Level(var texture: Texture) {
         private const val FLOA1 = "FLOA1"
         private const val FLOA2 = "FLOA2"
         private const val FLOA3 = "FLOA3"
+        private const val BRIV1 = "BRIV1"
     }
 
     //<editor-fold desc="tiles">
@@ -66,6 +67,7 @@ class Level(var texture: Texture) {
     var tileRock = Tile(Sprite(8, 7), tileType.SOLID)
     var tileRock2 = Tile(Sprite(9, 7), tileType.SOLID)
     var tileMushroom = Tile(Sprite(10, 6))
+    var tileWoodenBridgeVertical= Tile(Sprite(10, 2))
     var tileMushroom2 = Tile(Sprite(10, 7))
 
     var tileSet: Map<String, Tile> = mapOf(
@@ -88,7 +90,8 @@ class Level(var texture: Texture) {
             ROCK1 to tileRock,
             ROCK2 to tileRock2,
             MUSH1 to tileMushroom,
-            MUSH2 to tileMushroom2
+            MUSH2 to tileMushroom2,
+            BRIV1 to tileWoodenBridgeVertical
     )
     //</editor-fold>
 
@@ -104,13 +107,13 @@ class Level(var texture: Texture) {
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTWAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, FLOA2, FLOA2, FLOA2, CBL_G, BOT_G, CBR_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, FLOA2, FLOA2, FLOA2, CBL_G, BOT_G, CBR_G),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3),
+                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, EMPTY, EMPTY, EMPTY),
                 arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
                 arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, MID_G, TOP_G, TOP_G, CTR_G),
                 arrayOf(CBL_G, CBLFG, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
-                arrayOf(FLOA2, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G),
+                arrayOf(FLOA1, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G),
                 arrayOf(EMPTY, FLOA1, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA3)
         )
 

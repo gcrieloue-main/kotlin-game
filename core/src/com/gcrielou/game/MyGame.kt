@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.FitViewport
 import utils.*
+import java.time.temporal.ChronoUnit
 
 class MyGame : GameBase() {
 
@@ -33,6 +34,7 @@ class MyGame : GameBase() {
     private lateinit var swordSound: Music
     private lateinit var swordHitSound: Music
     private lateinit var gameOverSound: Music
+    private lateinit var monsterDeathSound1: Music
 
     lateinit var player: Player
     lateinit var level: Level
@@ -56,7 +58,7 @@ class MyGame : GameBase() {
         Gdx.input.inputProcessor = this
 
         enemies = listOf(
-                CubicMonster(spritesCubicMonster, 11, 13),
+                BlueCubicMonster(spritesCubicMonster, 11, 13),
                 CubicMonster(spritesCubicMonster, 6, 3),
                 CubicMonster(spritesCubicMonster, 8, 2)
         )
@@ -88,12 +90,14 @@ class MyGame : GameBase() {
         swordSound = Gdx.audio.newMusic(FileHandle("player/sword_sound01.wav"))
         swordHitSound = Gdx.audio.newMusic(FileHandle("player/sword_hit01.wav"))
         gameOverSound = Gdx.audio.newMusic(FileHandle("player/game_over01.wav"))
+        monsterDeathSound1 = Gdx.audio.newMusic(FileHandle("monster/cubic_death_sound01.wav"))
         monsterGruntSound.volume = 0.2f
         monsterGruntSound2.volume = 0.2f
         monsterGruntSound3.volume = 0.2f
         swordSound.volume = 0.2f
         swordHitSound.volume = 0.2f
         gameOverSound.volume = 0.2f
+        monsterDeathSound1.volume = 0.8f
     }
 
     /*
@@ -242,23 +246,44 @@ class MyGame : GameBase() {
             if (enemy.isAlive()) {
                 val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
                 if (distanceEnemy.toSpriteUnits() < 2) {
-                    enemy.loseHealth()
                     swordHitSound.play()
-                    val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
-                    if (level.canMoveRight(enemy.positionX, enemy.positionY, recoilX))
-                        enemy.moveRight(recoilX)
-                    if (level.canMoveUp(enemy.positionX, enemy.positionY, recoilX))
-                        enemy.moveUp(recoilY)
-
-                    if (Math.random() > 0.5)
-                        monsterGruntSound.play()
-                    else if ((Math.random() > 0.7)) monsterGruntSound2.play()
-                    else monsterGruntSound3.play()
+                    enemy.loseHealth()
+                    if (enemy.isAlive()) {
+                        computeEnemyRecoil(enemy)
+                        if (Math.random() > 0.5)
+                            monsterGruntSound.play()
+                        else if ((Math.random() > 0.7)) monsterGruntSound2.play()
+                        else monsterGruntSound3.play()
+                    } else {
+                        monsterDeathSound1.play()
+                    }
                 }
             }
         }
     }
 
+    private fun computeEnemyRecoil(enemy: Character) {
+        val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
+        if (recoilX > 0) {
+            if (level.canMoveRight(enemy.positionX, enemy.positionY, recoilX)) {
+                enemy.moveRight(recoilX)
+            }
+        } else {
+            if (level.canMoveLeft(enemy.positionX, enemy.positionY, recoilX)) {
+                enemy.moveLeft(-recoilX)
+            }
+        }
+
+        if (recoilY > 0) {
+            if (level.canMoveUp(enemy.positionX, enemy.positionY, recoilY)) {
+                enemy.moveUp(recoilY)
+            }
+        } else {
+            if (level.canMoveDown(enemy.positionX, enemy.positionY, recoilY)) {
+                enemy.moveDown(-recoilY)
+            }
+        }
+    }
 
     private fun animateSword() {
         spritesStack.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
