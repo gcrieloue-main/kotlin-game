@@ -19,7 +19,6 @@ class MyGame : GameBase() {
     private lateinit var spritesCharacter: Texture
     private lateinit var spritesCubicMonster: Texture
     private lateinit var spritesEnv: Texture
-    private lateinit var spritesEnemy: Texture
     private lateinit var camera: OrthographicCamera
     private lateinit var viewport: FitViewport
     private lateinit var renderer: ShapeRenderer
@@ -31,6 +30,9 @@ class MyGame : GameBase() {
     private lateinit var monsterGruntSound: Music
     private lateinit var monsterGruntSound2: Music
     private lateinit var monsterGruntSound3: Music
+    private lateinit var swordSound: Music
+    private lateinit var swordHitSound: Music
+    private lateinit var gameOverSound: Music
 
     lateinit var player: Player
     lateinit var level: Level
@@ -38,13 +40,14 @@ class MyGame : GameBase() {
 
     private var displayGrid = false
     private var displayCoords = false
-    private var hasMusic = false
+    private var hasMusic = true
+
+    private var isGameOver = false
 
     override fun create() {
         batch = SpriteBatch()
         spritesCharacter = Texture("char_sprites.png")
         spritesEnv = Texture("env_sprites.png")
-        spritesEnemy = Texture("zombies_and_skeletons.png")
         spritesCubicMonster = Texture("cubic_monsters.png")
         level = Level(spritesEnv)
         camera = OrthographicCamera()
@@ -53,7 +56,7 @@ class MyGame : GameBase() {
         Gdx.input.inputProcessor = this
 
         enemies = listOf(
-                Enemy(spritesEnemy, 11, 13),
+                CubicMonster(spritesCubicMonster, 11, 13),
                 CubicMonster(spritesCubicMonster, 6, 3),
                 CubicMonster(spritesCubicMonster, 8, 2)
         )
@@ -74,7 +77,7 @@ class MyGame : GameBase() {
 
     private fun setSounds() {
         music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
-        music.volume = 0.7f
+        music.volume = 0.1f
         walkSound = Gdx.audio.newMusic(FileHandle("player/sfx_step_grass_l.mp3"))
         walkSound.volume = 0.2f
         gruntSound = Gdx.audio.newMusic(FileHandle("player/gruntsound.wav"))
@@ -82,9 +85,15 @@ class MyGame : GameBase() {
         monsterGruntSound = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound01.wav"))
         monsterGruntSound2 = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound02.wav"))
         monsterGruntSound3 = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound03.wav"))
+        swordSound = Gdx.audio.newMusic(FileHandle("player/sword_sound01.wav"))
+        swordHitSound = Gdx.audio.newMusic(FileHandle("player/sword_hit01.wav"))
+        gameOverSound = Gdx.audio.newMusic(FileHandle("player/game_over01.wav"))
         monsterGruntSound.volume = 0.2f
         monsterGruntSound2.volume = 0.2f
         monsterGruntSound3.volume = 0.2f
+        swordSound.volume = 0.2f
+        swordHitSound.volume = 0.2f
+        gameOverSound.volume = 0.2f
     }
 
     /*
@@ -109,20 +118,24 @@ class MyGame : GameBase() {
     }
 
     private fun draw() {
-        handleKeys()
+        if (!isGameOver && !player.isAlive()) {
+            isGameOver = true
+            gameOverSound.play()
+        }
 
         level.draw(batch)
+        drawEnemies()
+        drawSpritesStack()
 
         if (player.isAlive())
             player.drawCharacter(batch)
-
-        drawEnemies()
 
         if (displayCoords) {
             drawCoords()
         }
 
-        drawSpritesStack()
+        if (player.isAlive())
+            handleKeys()
     }
 
 
@@ -130,9 +143,7 @@ class MyGame : GameBase() {
 
         if (spritesStack.size > 0) {
             val positionedSprite = spritesStack.get(0)
-//            println(listOf<Any>(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
-//                    Config.SPRITE_SIZE,
-//                    "x:" + positionedSprite.sprite.x, "y:" + positionedSprite.sprite.y).joinToString(" - "))
+
             batch.drawSprite(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
                     Config.SPRITE_SIZE,
                     positionedSprite.sprite.x, positionedSprite.sprite.y)
@@ -232,10 +243,12 @@ class MyGame : GameBase() {
                 val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
                 if (distanceEnemy.toSpriteUnits() < 2) {
                     enemy.loseHealth()
-
+                    swordHitSound.play()
                     val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
-                    enemy.moveRight(recoilX)
-                    enemy.moveUp(recoilY)
+                    if (level.canMoveRight(enemy.positionX, enemy.positionY, recoilX))
+                        enemy.moveRight(recoilX)
+                    if (level.canMoveUp(enemy.positionX, enemy.positionY, recoilX))
+                        enemy.moveUp(recoilY)
 
                     if (Math.random() > 0.5)
                         monsterGruntSound.play()
@@ -245,6 +258,7 @@ class MyGame : GameBase() {
             }
         }
     }
+
 
     private fun animateSword() {
         spritesStack.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
@@ -262,11 +276,14 @@ class MyGame : GameBase() {
                 else music.play()
             }
             Input.Keys.ALT_LEFT -> {
-                player.currentState = "FIGHT"
+                if (player.isAlive()) {
+                    player.currentState = "FIGHT"
 
-                // try sword animation
-                animateSword()
-                hurtEnemiesArround()
+                    // try sword animation
+                    animateSword()
+                    swordSound.play()
+                    hurtEnemiesArround()
+                }
             }
         }
         return false

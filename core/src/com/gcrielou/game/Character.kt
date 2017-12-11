@@ -32,7 +32,7 @@ open class Character(var texture: Texture) {
 
     var orientation: Orientation = Orientation.NONE
 
-    open var health = 5
+    open var health = 3
     var secondsSinceLastHealthLost = 0f
 
     open var statesSprites: Map<String, Array<Sprite>> = mapOf(
