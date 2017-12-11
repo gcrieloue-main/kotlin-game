@@ -122,15 +122,28 @@ class MyGame : GameBase() {
             drawCoords()
         }
 
+        drawSpritesStack()
+    }
+
+
+    private fun drawSpritesStack() {
+
         if (spritesStack.size > 0) {
-            val positionedSprite = spritesStack.removeAt(0)
-            println(listOf<Any>(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
-                    Config.SPRITE_SIZE,
-                    "x:" + positionedSprite.sprite.x, "y:" + positionedSprite.sprite.y).joinToString(" - "))
+            val positionedSprite = spritesStack.get(0)
+//            println(listOf<Any>(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
+//                    Config.SPRITE_SIZE,
+//                    "x:" + positionedSprite.sprite.x, "y:" + positionedSprite.sprite.y).joinToString(" - "))
             batch.drawSprite(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
                     Config.SPRITE_SIZE,
                     positionedSprite.sprite.x, positionedSprite.sprite.y)
+
+            lastSpriteDraw += Gdx.graphics.deltaTime
+            if (lastSpriteDraw > 0.05) {
+                spritesStack.removeAt(0)
+                lastSpriteDraw = 0f
+            }
         }
+
     }
 
     fun drawEnemies() {
@@ -147,6 +160,7 @@ class MyGame : GameBase() {
 
     class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
 
+    var lastSpriteDraw: Float = 0f
     var spritesStack: MutableList<PositionedSprite> = mutableListOf()
 
     private fun handleEnemyBehavior(enemy: Character) {
@@ -205,40 +219,37 @@ class MyGame : GameBase() {
         if (Input.Keys.SPACE.isKeyPressed()) {
             player.currentState = "JUMP"
         }
-        if (Input.Keys.ALT_LEFT.isKeyPressed()) {
-            lastAttackTime += Gdx.graphics.deltaTime
-            if (lastAttackTime > 0.2) {
-                lastAttackTime = 0f
 
-                player.currentState = "FIGHT"
-                for (enemy in enemies) {
-                    if (enemy.isAlive()) {
-                        val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
-                        if (distanceEnemy.toSpriteUnits() < 2) {
-                            enemy.loseHealth()
-
-                            if (Math.random() > 0.5)
-                                monsterGruntSound.play()
-                            else if ((Math.random() > 0.7)) monsterGruntSound2.play()
-                            else monsterGruntSound3.play()
-                        }
-                    }
-                }
-
-                // try sword animation
-                var x = player.positionX + Config.SPRITE_SIZE_WORLD_UNIT * 2 / 3
-                var y = player.positionY + Config.SPRITE_SIZE_WORLD_UNIT / 3
-                spritesStack.add(PositionedSprite(Sprite(0, 2), x, y, spritesCubicMonster))
-                spritesStack.add(PositionedSprite(Sprite(1, 2), x, y, spritesCubicMonster))
-                spritesStack.add(PositionedSprite(Sprite(2, 2), x, y, spritesCubicMonster))
-                spritesStack.add(PositionedSprite(Sprite(3, 2), x, y, spritesCubicMonster))
-            }
-
-        }
 
         if (player.isAlive() && player.currentState.startsWith("RUNNING") && !walkSound.isPlaying) {
             walkSound.play()
         }
+    }
+
+    private fun hurtEnemiesArround() {
+        for (enemy in enemies) {
+            if (enemy.isAlive()) {
+                val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
+                if (distanceEnemy.toSpriteUnits() < 2) {
+                    enemy.loseHealth()
+
+                    val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
+                    enemy.moveRight(recoilX)
+                    enemy.moveUp(recoilY)
+
+                    if (Math.random() > 0.5)
+                        monsterGruntSound.play()
+                    else if ((Math.random() > 0.7)) monsterGruntSound2.play()
+                    else monsterGruntSound3.play()
+                }
+            }
+        }
+    }
+
+    private fun animateSword() {
+        spritesStack.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+        spritesStack.add(PositionedSprite(Sprite(1, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+        spritesStack.add(PositionedSprite(Sprite(2, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -249,6 +260,13 @@ class MyGame : GameBase() {
                 hasMusic = !hasMusic
                 if (music.isPlaying) music.pause()
                 else music.play()
+            }
+            Input.Keys.ALT_LEFT -> {
+                player.currentState = "FIGHT"
+
+                // try sword animation
+                animateSword()
+                hurtEnemiesArround()
             }
         }
         return false

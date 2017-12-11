@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import utils.drawSprite
+import utils.toSpriteUnits
+import utils.toWorldUnits
 
 /**
  * Created by gcrielou on 05/12/2017.
@@ -99,6 +101,41 @@ open class Character(var texture: Texture) {
 
     open fun computePlayerMoveLength() = Gdx.graphics.deltaTime * Config.PLAYER_SPEED
 
+    fun getEnemyRecoil(playerX: Float, playerY: Float): Pair<Float, Float> {
+        // we want the enemy to go back in the character opposite direction for distanceX distance of 1 sprite
+
+        var moveX = 0.0
+        var moveY = 0.0
+
+        var distanceX = (positionX - playerX).toSpriteUnits()
+        var distanceY = (positionY - playerY).toSpriteUnits()
+
+
+        if (distanceY == 0f) {
+            // same playerY axis
+            moveX = 1.0
+            moveY = 0.0
+        } else if (distanceX == 0f) {
+            // same playerX axis
+            moveX = 0.0
+            moveY = 1.0
+        } else {
+            // distanceEnemy is the distance between enemy and character
+            var distanceEnemy = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble())
+
+            // moveX is the distance the enemy go back on playerX axis
+            moveX = distanceX / distanceEnemy
+            println("distanceX=$distanceX, distanceY=$distanceY, distanceEnemy=$distanceEnemy, moveX=$moveX")
+            // moveX is the distance the enemy go back on playerY axis
+            moveY = Math.sqrt(1 - moveX * moveX)
+        }
+
+        if (playerX > positionX) moveX = -moveX
+        if (playerY > positionY) moveY = -moveY
+        println("" + moveX + " " + moveY)
+
+        return Pair(moveX.toFloat().toWorldUnits(), moveY.toFloat().toWorldUnits())
+    }
 
     fun loseHealth() {
         secondsSinceLastHealthLost += Gdx.graphics.deltaTime
