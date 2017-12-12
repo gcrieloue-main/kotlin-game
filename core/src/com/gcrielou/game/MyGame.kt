@@ -47,11 +47,16 @@ class MyGame : GameBase() {
 
     override fun create() {
         batch = SpriteBatch()
-        level = Level(spritesEnv)
         camera = OrthographicCamera()
         viewport = FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera)
         renderer = ShapeRenderer()
         Gdx.input.inputProcessor = this
+
+        createTextures()
+        createFonts()
+        createSounds()
+
+        level = Level(spritesEnv)
 
         enemies = listOf(
                 BlueCubicMonster(spritesCubicMonster, 11, 13),
@@ -59,10 +64,6 @@ class MyGame : GameBase() {
                 CubicMonster(spritesCubicMonster, 8, 2)
         )
         player = Player(spritesCharacter)
-
-        createTextures()
-        createFonts()
-        createSounds()
 
         if (hasMusic) {
             music.play()
