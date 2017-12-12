@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.FitViewport
 import utils.*
-import java.time.temporal.ChronoUnit
 
 class MyGame : GameBase() {
 
@@ -48,9 +47,6 @@ class MyGame : GameBase() {
 
     override fun create() {
         batch = SpriteBatch()
-        spritesCharacter = Texture("char_sprites.png")
-        spritesEnv = Texture("env_sprites.png")
-        spritesCubicMonster = Texture("cubic_monsters.png")
         level = Level(spritesEnv)
         camera = OrthographicCamera()
         viewport = FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera)
@@ -64,40 +60,56 @@ class MyGame : GameBase() {
         )
         player = Player(spritesCharacter)
 
-        val generator = FreeTypeFontGenerator(FileHandle("OpenSans-Regular.ttf"))
-        val param = FreeTypeFontGenerator.FreeTypeFontParameter()
-        param.size = 16
-        font = generator.generateFont(param)
-        generator.dispose()
-
-        setSounds()
+        createTextures()
+        createFonts()
+        createSounds()
 
         if (hasMusic) {
             music.play()
         }
     }
 
-    private fun setSounds() {
+    private fun createTextures() {
+        spritesCharacter = Texture("char_sprites.png")
+        spritesEnv = Texture("env_sprites.png")
+        spritesCubicMonster = Texture("cubic_monsters.png")
+    }
+
+    private fun createFonts() {
+        val generator = FreeTypeFontGenerator(FileHandle("OpenSans-Regular.ttf"))
+        val param = FreeTypeFontGenerator.FreeTypeFontParameter()
+        param.size = 16
+        font = generator.generateFont(param)
+        generator.dispose()
+    }
+
+    private fun createSounds() {
         music = Gdx.audio.newMusic(FileHandle("winds_of_stories.mp3"))
-        music.volume = 0.1f
+        music.volume = 0.05f
+
         walkSound = Gdx.audio.newMusic(FileHandle("player/sfx_step_grass_l.mp3"))
         walkSound.volume = 0.2f
+
         gruntSound = Gdx.audio.newMusic(FileHandle("player/gruntsound.wav"))
         gruntSound.volume = 0.2f
+
         monsterGruntSound = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound01.wav"))
         monsterGruntSound2 = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound02.wav"))
         monsterGruntSound3 = Gdx.audio.newMusic(FileHandle("monster/cubic_hurt_sound03.wav"))
-        swordSound = Gdx.audio.newMusic(FileHandle("player/sword_sound01.wav"))
-        swordHitSound = Gdx.audio.newMusic(FileHandle("player/sword_hit01.wav"))
-        gameOverSound = Gdx.audio.newMusic(FileHandle("player/game_over01.wav"))
-        monsterDeathSound1 = Gdx.audio.newMusic(FileHandle("monster/cubic_death_sound01.wav"))
         monsterGruntSound.volume = 0.2f
         monsterGruntSound2.volume = 0.2f
         monsterGruntSound3.volume = 0.2f
+
+        monsterDeathSound1 = Gdx.audio.newMusic(FileHandle("monster/cubic_death_sound01.wav"))
+        monsterDeathSound1.volume = 0.8f
+
+        swordSound = Gdx.audio.newMusic(FileHandle("player/sword_sound01.wav"))
+        swordHitSound = Gdx.audio.newMusic(FileHandle("player/sword_hit01.wav"))
         swordSound.volume = 0.2f
         swordHitSound.volume = 0.2f
+
+        gameOverSound = Gdx.audio.newMusic(FileHandle("player/game_over01.wav"))
         gameOverSound.volume = 0.2f
-        monsterDeathSound1.volume = 0.8f
     }
 
     /*
@@ -115,7 +127,6 @@ class MyGame : GameBase() {
             drawGrid()
         }
     }
-
 
     override fun resize(width: Int, height: Int) {
         viewport.update(width, height, true)
@@ -142,6 +153,9 @@ class MyGame : GameBase() {
             handleKeys()
     }
 
+    class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
+    var lastSpriteDraw: Float = 0f
+    var spritesStack: MutableList<PositionedSprite> = mutableListOf()
 
     private fun drawSpritesStack() {
 
@@ -163,20 +177,12 @@ class MyGame : GameBase() {
 
     fun drawEnemies() {
         for (enemy in enemies) {
-
-            if (enemy.isAlive())
+            if (enemy.isAlive()) {
                 enemy.drawCharacter(batch)
-
-            if (enemy.isAlive())
                 handleEnemyBehavior(enemy)
-
+            }
         }
     }
-
-    class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
-
-    var lastSpriteDraw: Float = 0f
-    var spritesStack: MutableList<PositionedSprite> = mutableListOf()
 
     private fun handleEnemyBehavior(enemy: Character) {
         val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
@@ -211,8 +217,6 @@ class MyGame : GameBase() {
         }
     }
 
-    private var lastAttackTime: Float = 0f
-
     private fun handleKeys() {
         val distance: Float = player.computePlayerMoveLength()
         if (Input.Keys.DOWN.isKeyPressed()) {
@@ -234,7 +238,6 @@ class MyGame : GameBase() {
         if (Input.Keys.SPACE.isKeyPressed()) {
             player.currentState = "JUMP"
         }
-
 
         if (player.isAlive() && player.currentState.startsWith("RUNNING") && !walkSound.isPlaying) {
             walkSound.play()
