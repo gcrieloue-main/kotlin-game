@@ -1,4 +1,4 @@
-package com.gcrielou.game;
+package com.gcrielou.game
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -67,7 +67,7 @@ class Level(var texture: Texture) {
     var tileRock = Tile(Sprite(8, 7), tileType.SOLID)
     var tileRock2 = Tile(Sprite(9, 7), tileType.SOLID)
     var tileMushroom = Tile(Sprite(10, 6))
-    var tileWoodenBridgeVertical= Tile(Sprite(10, 2))
+    var tileWoodenBridgeVertical = Tile(Sprite(10, 2))
     var tileMushroom2 = Tile(Sprite(10, 7))
 
     var tileSet: Map<String, Tile> = mapOf(
@@ -95,90 +95,54 @@ class Level(var texture: Texture) {
     )
     //</editor-fold>
 
-    var levelLayer: Array<Array<String>>
-    var elementsLayer: Array<Array<String>>
+    var levelLayer: List<ArrayList<String>>
+    var elementsLayer: List<ArrayList<String>>
 
     init {
-        levelLayer = arrayOf(
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTL_G, TOP_G, CTR_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTWAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, RIG_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, FLOA2, FLOA2, FLOA2, CBL_G, BOT_G, CBR_G),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
-                arrayOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, MID_G, TOP_G, TOP_G, CTR_G),
-                arrayOf(CBL_G, CBLFG, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
-                arrayOf(FLOA1, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G),
-                arrayOf(EMPTY, FLOA1, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA3)
+        var levelLayer1: ArrayList<ArrayList<String>>
+        var levelTEST: ArrayList<ArrayList<String>>
+
+        levelLayer1 = arrayListOf(
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTL_G, TOP_G, CTR_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTWAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, FLOA2, FLOA2, FLOA2, CBL_G, BOT_G, CBR_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BRIV1, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, V_WAY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(CTL_G, TOP_G, TOP_G, TOP_G, TOP_G, TOP_G, MID_G, TOP_G, TOP_G, CTR_G),
+                arrayListOf(CBL_G, CBLFG, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, MID_G, RIG_G),
+                arrayListOf(FLOA1, CBL_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, BOT_G, CBR_G),
+                arrayListOf(EMPTY, FLOA1, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, FLOA3)
         )
 
-        elementsLayer = arrayOf(
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MUSH1, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK2, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, MUSH1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY, EMPTY, MUSH2, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
+        elementsLayer = arrayListOf(
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MUSH1, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK2, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, MUSH1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY, EMPTY, MUSH2, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
         )
+
 
         // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
-        levelLayer = levelLayer.reversedArray()
-        elementsLayer = elementsLayer.reversedArray()
-    }
-
-
-    fun canMoveRight(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT + distance, y) == tileType.EMPTY)
-
-    fun canMoveLeft(x: Float, y: Float, distance: Float): Boolean = (getTileType(x - distance, y) == tileType.EMPTY)
-
-    fun canMoveUp(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT / 2, y + distance) == tileType.EMPTY)
-
-    fun canMoveDown(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT / 2, y - distance) == tileType.EMPTY)
-
-    private fun getTileType(x: Float, y: Float): tileType? {
-
-        var tileCoordX = (x.toSpriteUnits()).floor()
-        var tileCoordY = (y.toSpriteUnits()).floor()
-
-        val elementTileType = getTileType(elementsLayer, tileCoordX, tileCoordY)
-        if (elementTileType != null && elementTileType != tileType.EMPTY) {
-            return elementTileType
-        }
-
-        val levelTileType = getTileType(levelLayer, tileCoordX, tileCoordY)
-
-        return levelTileType
-    }
-
-    private fun getTileType(level: Array<Array<String>>, x: Int, y: Int): tileType? {
-
-        if (y >= 0 && y < level.size) {
-            val row = level.get(y)
-            if (x >= 0 && x < row.size) {
-                val tileElementsStringRepresentation = row.get(x)
-                if (tileElementsStringRepresentation.isNotEmpty()) {
-                    val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
-                    return tileElements?.type
-                }
-            }
-        }
-
-        return null
+        levelLayer = levelLayer1.reversed()
+        elementsLayer = elementsLayer.reversed()
     }
 
     fun draw(batch: Batch) {
@@ -207,5 +171,70 @@ class Level(var texture: Texture) {
                 }
             }
         }
+    }
+
+    fun canMoveRight(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT + distance, y) == tileType.EMPTY)
+
+    fun canMoveLeft(x: Float, y: Float, distance: Float): Boolean = (getTileType(x - distance, y) == tileType.EMPTY)
+
+    fun canMoveUp(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT / 2, y + distance) == tileType.EMPTY)
+
+    fun canMoveDown(x: Float, y: Float, distance: Float): Boolean = (getTileType(x + Config.SPRITE_SIZE_WORLD_UNIT / 2, y - distance) == tileType.EMPTY)
+
+    private fun getTileType(x: Float, y: Float): tileType? {
+
+        var tileCoordX = (x.toSpriteUnits()).floor()
+        var tileCoordY = (y.toSpriteUnits()).floor()
+
+        val elementTileType = getTileType(elementsLayer, tileCoordX, tileCoordY)
+        if (elementTileType != null && elementTileType != tileType.EMPTY) {
+            return elementTileType
+        }
+
+        val levelTileType = getTileType(levelLayer, tileCoordX, tileCoordY)
+
+        return levelTileType
+    }
+
+    private fun getTileType(level: List<ArrayList<String>>, x: Int, y: Int): tileType? {
+
+        if (y >= 0 && y < level.size) {
+            val row = level.get(y)
+            if (x >= 0 && x < row.size) {
+                val tileElementsStringRepresentation = row.get(x)
+                if (tileElementsStringRepresentation.isNotEmpty()) {
+                    val tileElements: Tile? = tileSet.get(tileElementsStringRepresentation)
+                    return tileElements?.type
+                }
+            }
+        }
+
+        return null
+    }
+
+    private fun fusionLevelArray(levelLayer1: List<ArrayList<String>>, levelLayer2: List<ArrayList<String>>, x: Int, y: Int): ArrayList<ArrayList<String>> {
+
+        // copy first layer to level
+        var fusionLevel = ArrayList<ArrayList<String>>(200)
+        for ((ay, ayArray) in levelLayer1.withIndex()) {
+            fusionLevel.add(ay, arrayListOf())
+            for ((ax, sprite) in ayArray.withIndex()) {
+                fusionLevel.get(ay).add(ax, sprite)
+            }
+        }
+
+        // copy second layer to level with (x,y) shift
+        for ((ay, ayArray) in levelLayer2.withIndex()) {
+            if ((ay + y) >= fusionLevel.size)
+                fusionLevel.add(fusionLevel.size, ArrayList())
+            for ((ax, sprite) in ayArray.withIndex()) {
+                for (i in ax..ax + x) {
+                    fusionLevel.get(ay + y).add("")
+                }
+                fusionLevel.get(ay + y).add(ax + x, sprite)
+            }
+        }
+
+        return fusionLevel
     }
 }
