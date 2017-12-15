@@ -2,6 +2,7 @@ package com.gcrielou.game
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -30,7 +31,7 @@ class MyGame : GameBase() {
     private lateinit var monsterGruntSound: Music
     private lateinit var monsterGruntSound2: Music
     private lateinit var monsterGruntSound3: Music
-    private lateinit var swordSound: Music
+    private lateinit var swordSound: Sound
     private lateinit var swordHitSound: Music
     private lateinit var gameOverSound: Music
     private lateinit var monsterDeathSound1: Music
@@ -104,9 +105,8 @@ class MyGame : GameBase() {
         monsterDeathSound1 = Gdx.audio.newMusic(FileHandle("monster/cubic_death_sound01.wav"))
         monsterDeathSound1.volume = 0.8f
 
-        swordSound = Gdx.audio.newMusic(FileHandle("player/sword_sound01.wav"))
+        swordSound = Gdx.audio.newSound(FileHandle("player/sword_sound01.wav"))
         swordHitSound = Gdx.audio.newMusic(FileHandle("player/sword_hit01.wav"))
-        swordSound.volume = 0.2f
         swordHitSound.volume = 0.2f
 
         gameOverSound = Gdx.audio.newMusic(FileHandle("player/game_over01.wav"))

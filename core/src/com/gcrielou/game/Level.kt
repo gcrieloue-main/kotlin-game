@@ -229,7 +229,7 @@ class Level(var texture: Texture) {
                 fusionLevel.add(fusionLevel.size, ArrayList())
             for ((ax, sprite) in ayArray.withIndex()) {
                 for (i in ax..ax + x) {
-                    fusionLevel.get(ay + y).add("")
+                    fusionLevel.get(ay + y).add(EMPTY)
                 }
                 fusionLevel.get(ay + y).add(ax + x, sprite)
             }
