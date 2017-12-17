@@ -38,7 +38,7 @@ class MyGame : GameBase() {
 
     lateinit var player: Player
     lateinit var level: Level
-    lateinit var enemies: List<Character>
+    lateinit var enemies: MutableList<Character>
 
     private var displayGrid = false
     private var displayCoords = false
@@ -57,14 +57,18 @@ class MyGame : GameBase() {
         createFonts()
         createSounds()
 
+        startGame()
+    }
+
+    private fun startGame() {
         level = Level(spritesEnv)
 
-        enemies = listOf(
-                BlueCubicMonster(spritesCubicMonster, 11, 13),
-                CubicMonster(spritesCubicMonster, 6, 3),
-                CubicMonster(spritesCubicMonster, 8, 2)
+        enemies = mutableListOf(
+                BlueCubicMonster(spritesCubicMonster, 11, 8)
         )
         player = Player(spritesCharacter)
+        player.positionX = 10f.toWorldUnits()
+        player.positionY = 11f.toWorldUnits()
 
         if (hasMusic) {
             music.play()
@@ -135,8 +139,22 @@ class MyGame : GameBase() {
 
     private fun draw() {
         if (!isGameOver && !player.isAlive()) {
+            println("Game over")
             isGameOver = true
             gameOverSound.play()
+        }
+
+        if (level.levelNumber == 0 && enemies.isEmpty()) {
+            level.level1()
+            enemies = mutableListOf(
+                    CubicMonster(spritesCubicMonster, 6, 3),
+                    CubicMonster(spritesCubicMonster, 8, 2)
+            )
+        }
+
+        if (level.levelNumber == 1 && enemies.isEmpty()) {
+            println("VICTORY !")
+            isGameOver = true
         }
 
         level.draw(batch)
@@ -155,6 +173,7 @@ class MyGame : GameBase() {
     }
 
     class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
+
     var lastSpriteDraw: Float = 0f
     var spritesStack: MutableList<PositionedSprite> = mutableListOf()
 
@@ -264,6 +283,7 @@ class MyGame : GameBase() {
                 }
             }
         }
+        enemies.removeIf { !it.isAlive() }
     }
 
     private fun computeEnemyRecoil(enemy: Character) {
@@ -312,6 +332,13 @@ class MyGame : GameBase() {
                     animateSword()
                     swordSound.play()
                     hurtEnemiesArround()
+                }
+            }
+            Input.Keys.R -> {
+                if (isGameOver) {
+                    println("restart")
+                    isGameOver = false
+                    startGame()
                 }
             }
         }
