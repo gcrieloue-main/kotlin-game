@@ -64,11 +64,11 @@ class MyGame : GameBase() {
         level = Level(spritesEnv)
 
         enemies = mutableListOf(
-                BlueCubicMonster(spritesCubicMonster, 11, 8)
+                BlueCubicMonster(spritesCubicMonster, 12, 9)
         )
         player = Player(spritesCharacter)
-        player.positionX = 10f.toWorldUnits()
-        player.positionY = 11f.toWorldUnits()
+        player.positionX = 11f.toWorldUnits()
+        player.positionY = 12f.toWorldUnits()
 
         if (hasMusic) {
             music.play()
@@ -147,12 +147,12 @@ class MyGame : GameBase() {
         if (level.levelNumber == 0 && enemies.isEmpty()) {
             level.level1()
             enemies = mutableListOf(
-                    CubicMonster(spritesCubicMonster, 6, 3),
-                    CubicMonster(spritesCubicMonster, 8, 2)
+                    CubicMonster(spritesCubicMonster, 7, 4),
+                    CubicMonster(spritesCubicMonster, 9, 3)
             )
         }
 
-        if (level.levelNumber == 1 && enemies.isEmpty()) {
+        if (!isGameOver && level.levelNumber == 1 && enemies.isEmpty()) {
             println("VICTORY !")
             isGameOver = true
         }
@@ -249,16 +249,13 @@ class MyGame : GameBase() {
     private fun hurtEnemiesArround() {
         for (enemy in enemies) {
             if (enemy.isAlive()) {
-                val distanceEnemy = distance(Pair(player.positionX, player.positionY), Pair(enemy.positionX, enemy.positionY))
-                if (distanceEnemy.toSpriteUnits() < 2) {
+                val enemyhurt = isEnemyhurt(enemy)
+                if (enemyhurt) {
                     swordHitSound.play()
                     enemy.loseHealth()
                     if (enemy.isAlive()) {
                         computeEnemyRecoil(enemy)
-                        if (Math.random() > 0.5)
-                            monsterGruntSound.play()
-                        else if ((Math.random() > 0.7)) monsterGruntSound2.play()
-                        else monsterGruntSound3.play()
+                        enemyHurtSound()
                     } else {
                         monsterDeathSound1.play()
                     }
@@ -267,6 +264,30 @@ class MyGame : GameBase() {
         }
         enemies.removeIf { !it.isAlive() }
     }
+
+    private fun enemyHurtSound() =
+            when {
+                Math.random() > 0.5 -> monsterGruntSound.play()
+                Math.random() > 0.7 -> monsterGruntSound2.play()
+                else -> monsterGruntSound3.play()
+            }
+
+    private fun isEnemyhurt(enemy: Character): Boolean =
+            when {
+                player.orientation == Character.Orientation.RIGHT || player.orientation == Character.Orientation.UP -> {
+                    (enemy.positionX >= player.positionX && enemy.positionX <= player.positionX + 2f.toWorldUnits()
+                            && enemy.positionY + 1f.toWorldUnits() >= player.positionY && enemy.positionY <= player.positionY + 2f.toWorldUnits())
+                }
+                player.orientation == Character.Orientation.DOWN -> {
+                    (enemy.positionX <= player.positionX + 1f.toWorldUnits() && enemy.positionX >= player.positionX - 1f.toWorldUnits()
+                            && enemy.positionY <= player.positionY + 1f.toWorldUnits() && enemy.positionY + 1f.toWorldUnits() >= player.positionY - 1f.toWorldUnits())
+                }
+                player.orientation == Character.Orientation.LEFT -> {
+                    (enemy.positionX >= player.positionX - 1f.toWorldUnits() && enemy.positionX <= player.positionX + 1f.toWorldUnits()
+                            && enemy.positionY >= player.positionY && enemy.positionY + 1f.toWorldUnits() <= player.positionY - 1f.toWorldUnits())
+                }
+                else -> false
+            }
 
     private fun computeEnemyRecoil(enemy: Character) {
         val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
@@ -293,9 +314,24 @@ class MyGame : GameBase() {
 
     private fun animateSword() {
         var animation: MutableList<PositionedSprite> = mutableListOf()
-        animation.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
-        animation.add(PositionedSprite(Sprite(1, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
-        animation.add(PositionedSprite(Sprite(2, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+        when {
+            player.orientation == Character.Orientation.LEFT -> {
+                animation.add(PositionedSprite(Sprite(0, 2, 1, true), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+                animation.add(PositionedSprite(Sprite(1, 2, 1, true), player.positionX - Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+                animation.add(PositionedSprite(Sprite(2, 2, 1, true), player.positionX - Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+            }
+            player.orientation == Character.Orientation.RIGHT || player.orientation == Character.Orientation.UP -> {
+                animation.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+                animation.add(PositionedSprite(Sprite(1, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+                animation.add(PositionedSprite(Sprite(2, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+            }
+            player.orientation == Character.Orientation.DOWN -> {
+                animation.add(PositionedSprite(Sprite(2, 2, 1, true), player.positionX - Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+                animation.add(PositionedSprite(Sprite(1, 2, 1, true, flipY = true), player.positionX - Config.SPRITE_SIZE_WORLD_UNIT, player.positionY - Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+                animation.add(PositionedSprite(Sprite(0, 2, 1, true), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT / 2, player.positionY - Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+            }
+            else -> throw IllegalArgumentException("Bad player orientation")
+        }
         spritesStack.add(animation)
     }
 
@@ -303,9 +339,9 @@ class MyGame : GameBase() {
     private fun animateWalkDirt() {
         if (lastWalkAnimation > 0.5f) {
             var animation: MutableList<PositionedSprite> = mutableListOf()
-            animation.add(PositionedSprite(Sprite(0, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
-            animation.add(PositionedSprite(Sprite(1, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
-            animation.add(PositionedSprite(Sprite(2, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            animation.add(PositionedSprite(Sprite(0, 5), player.positionX, player.positionY, spritesCubicMonster))
+            animation.add(PositionedSprite(Sprite(1, 5), player.positionX, player.positionY, spritesCubicMonster))
+            animation.add(PositionedSprite(Sprite(2, 5), player.positionX, player.positionY, spritesCubicMonster))
             spritesStack.add(animation)
             lastWalkAnimation = 0f
         }
@@ -325,7 +361,7 @@ class MyGame : GameBase() {
 
                     batch.drawSprite(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
                             Config.SPRITE_SIZE,
-                            positionedSprite.sprite.x, positionedSprite.sprite.y)
+                            positionedSprite.sprite.x, positionedSprite.sprite.y, positionedSprite.sprite.flipX, positionedSprite.sprite.flipY)
 
                     lastSpriteDraw += Gdx.graphics.deltaTime
                     if (lastSpriteDraw > 0.05) {

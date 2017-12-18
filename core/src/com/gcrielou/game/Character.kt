@@ -37,7 +37,6 @@ open class Character(var texture: Texture) {
 
     open var statesSprites: Map<String, Array<Sprite>> = mapOf(
             "RUNNING" to arrayOf(Sprite(1, 9), Sprite(2, 9), Sprite(3, 9)),
-            "RUNNING_LEFT" to arrayOf(Sprite(1, 9, flipX = true), Sprite(2, 9, flipX = true), Sprite(9, 3, flipX = true)),
             "IDLE" to arrayOf(Sprite(1, 7), Sprite(2, 7), Sprite(3, 7), Sprite(7, 3)),
             "JUMP" to arrayOf(Sprite(12, 1), Sprite(12, 2)),
             "FIGHT" to arrayOf(Sprite(1, 3), Sprite(2, 3), Sprite(3, 3), Sprite(4, 3))
@@ -70,11 +69,11 @@ open class Character(var texture: Texture) {
                 Config.SPRITE_SIZE,
                 sprite?.x ?: 0,
                 sprite?.y ?: 0,
-                flipX = sprite?.flipX ?: false)
+                orientation == Orientation.LEFT)
     }
 
     fun moveLeft(distance: Float) {
-        currentState = "RUNNING_LEFT"
+        currentState = "RUNNING"
         positionX -= distance
         orientation = Orientation.LEFT
     }
@@ -82,6 +81,7 @@ open class Character(var texture: Texture) {
     fun moveRight(distance: Float) {
         currentState = "RUNNING"
         positionX += distance
+        orientation = Orientation.RIGHT
     }
 
     fun hold() {

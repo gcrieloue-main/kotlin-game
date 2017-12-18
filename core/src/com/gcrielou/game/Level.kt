@@ -135,7 +135,7 @@ class Level(var texture: Texture) {
 
         // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
         val shiftY = 5
-        val shiftX = 10
+        val shiftX = 11
         levelLayer = fusionLevelArray(ArrayList<ArrayList<String>>(), levelLayer1.reversed(), shiftX, shiftY)
         elementsLayer = fusionLevelArray(ArrayList<ArrayList<String>>(), elementsLayer.reversed(), shiftX, shiftY)
     }
@@ -182,10 +182,11 @@ class Level(var texture: Texture) {
                 arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
         )
 
+        val shift = 1
 
         // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
-        levelLayer = fusionLevelArray(levelLayer, levelLayer1.reversed(), 0, 0)
-        elementsLayer = fusionLevelArray(elementsLayer, elementsLayer1.reversed(), 0, 0)
+        levelLayer = fusionLevelArray(levelLayer, levelLayer1.reversed(), shift, shift)
+        elementsLayer = fusionLevelArray(elementsLayer, elementsLayer1.reversed(), shift, shift)
     }
 
     fun draw(batch: Batch) {
