@@ -80,9 +80,7 @@ open class Character(var texture: Texture) {
 
     fun moveRight(distance: Float) {
         currentState = "RUNNING"
-        println("$positionX+$distance")
         positionX += distance
-        println("=>+$distance")
         orientation = Orientation.RIGHT
     }
 

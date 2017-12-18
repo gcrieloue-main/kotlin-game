@@ -328,7 +328,6 @@ class MyGame : GameBase() {
 
     private fun computeEnemyRecoil(enemy: Character) {
         val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
-        println(recoilX)
         if (recoilX > 0) {
             if (level.canMoveRight(enemy.positionX, enemy.positionY, recoilX)) {
                 enemy.moveRight(recoilX)
