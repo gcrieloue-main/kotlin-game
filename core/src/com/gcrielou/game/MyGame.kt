@@ -172,28 +172,6 @@ class MyGame : GameBase() {
             handleKeys()
     }
 
-    class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
-
-    var lastSpriteDraw: Float = 0f
-    var spritesStack: MutableList<PositionedSprite> = mutableListOf()
-
-    private fun drawSpritesStack() {
-
-        if (spritesStack.size > 0) {
-            val positionedSprite = spritesStack.get(0)
-
-            batch.drawSprite(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
-                    Config.SPRITE_SIZE,
-                    positionedSprite.sprite.x, positionedSprite.sprite.y)
-
-            lastSpriteDraw += Gdx.graphics.deltaTime
-            if (lastSpriteDraw > 0.05) {
-                spritesStack.removeAt(0)
-                lastSpriteDraw = 0f
-            }
-        }
-
-    }
 
     fun drawEnemies() {
         for (enemy in enemies) {
@@ -314,20 +292,49 @@ class MyGame : GameBase() {
     }
 
     private fun animateSword() {
-        spritesStack.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
-        spritesStack.add(PositionedSprite(Sprite(1, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
-        spritesStack.add(PositionedSprite(Sprite(2, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+        var animation: MutableList<PositionedSprite> = mutableListOf()
+        animation.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+        animation.add(PositionedSprite(Sprite(1, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
+        animation.add(PositionedSprite(Sprite(2, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+        spritesStack.add(animation)
     }
 
     var lastWalkAnimation = 0f
     private fun animateWalkDirt() {
         if (lastWalkAnimation > 0.5f) {
-            spritesStack.add(PositionedSprite(Sprite(0, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
-            spritesStack.add(PositionedSprite(Sprite(1, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
-            spritesStack.add(PositionedSprite(Sprite(2, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            var animation: MutableList<PositionedSprite> = mutableListOf()
+            animation.add(PositionedSprite(Sprite(0, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            animation.add(PositionedSprite(Sprite(1, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            animation.add(PositionedSprite(Sprite(2, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            spritesStack.add(animation)
             lastWalkAnimation = 0f
         }
         lastWalkAnimation += Gdx.graphics.deltaTime
+    }
+
+    class PositionedSprite(var sprite: Sprite, var x: Float, var y: Float, var texture: Texture)
+
+    var lastSpriteDraw: Float = 0f
+    var spritesStack: MutableList<MutableList<PositionedSprite>> = mutableListOf()
+
+    private fun drawSpritesStack() {
+        if (spritesStack.isNotEmpty()) {
+            for (animation in spritesStack) {
+                if (animation.isNotEmpty()) {
+                    val positionedSprite = animation.get(0)
+
+                    batch.drawSprite(positionedSprite.texture, positionedSprite.x, positionedSprite.y,
+                            Config.SPRITE_SIZE,
+                            positionedSprite.sprite.x, positionedSprite.sprite.y)
+
+                    lastSpriteDraw += Gdx.graphics.deltaTime
+                    if (lastSpriteDraw > 0.05) {
+                        spritesStack.removeAt(0)
+                        lastSpriteDraw = 0f
+                    }
+                }
+            }
+        }
     }
 
     override fun keyDown(keycode: Int): Boolean {

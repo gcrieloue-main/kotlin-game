@@ -109,27 +109,27 @@ class Level(var texture: Texture) {
         var levelLayer1: ArrayList<ArrayList<String>>
 
         levelLayer1 = arrayListOf(
-                arrayListOf(CTL_G, TOP_G, CTR_G),
-                arrayListOf(LEF_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, RIG_G),
-                arrayListOf(CBL_G, BOT_G, CBR_G),
-                arrayListOf(FLOA1, FLOA2, FLOA3)
+                arrayListOf(CTL_G, TOP_G, TOP_G, CTR_G),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(CBL_G, BOT_G, BOT_G, CBR_G),
+                arrayListOf(FLOA1, FLOA2, FLOA2, FLOA3)
         )
 
         elementsLayer = arrayListOf(
-                arrayListOf(EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, ROCK1, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, MUSH1, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, ROCK2, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY)
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, ROCK1, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, MUSH1, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, ROCK2, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY)
         )
 
 
