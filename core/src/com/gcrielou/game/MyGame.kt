@@ -17,9 +17,12 @@ import utils.*
 class MyGame : GameBase() {
 
     lateinit var batch: SpriteBatch
+
     private lateinit var spritesCharacter: Texture
     private lateinit var spritesCubicMonster: Texture
     private lateinit var spritesEnv: Texture
+    private lateinit var spritesObjects: Texture
+
     private lateinit var camera: OrthographicCamera
     private lateinit var viewport: FitViewport
     private lateinit var renderer: ShapeRenderer
@@ -31,9 +34,12 @@ class MyGame : GameBase() {
     private lateinit var monsterGruntSound: Music
     private lateinit var monsterGruntSound2: Music
     private lateinit var monsterGruntSound3: Music
+    private lateinit var eventResolutionSound1: Music
+    private lateinit var eventResolutionSound2: Music
     private lateinit var swordSound: Sound
     private lateinit var swordHitSound: Music
     private lateinit var gameOverSound: Music
+    private lateinit var takeSwordSound: Music
     private lateinit var monsterDeathSound1: Music
 
     lateinit var player: Player
@@ -45,6 +51,8 @@ class MyGame : GameBase() {
     private var hasMusic = true
 
     private var isGameOver = false
+
+    private var swordTaken = false
 
     override fun create() {
         batch = SpriteBatch()
@@ -79,6 +87,7 @@ class MyGame : GameBase() {
         spritesCharacter = Texture("char_sprites.png")
         spritesEnv = Texture("env_sprites.png")
         spritesCubicMonster = Texture("cubic_monsters.png")
+        spritesObjects = Texture("objects.png")
     }
 
     private fun createFonts() {
@@ -115,6 +124,13 @@ class MyGame : GameBase() {
 
         gameOverSound = Gdx.audio.newMusic(FileHandle("player/game_over01.wav"))
         gameOverSound.volume = 0.2f
+
+        eventResolutionSound1 = Gdx.audio.newMusic(FileHandle("events/resolution01.wav"))
+        eventResolutionSound1.volume = 1f
+        eventResolutionSound2 = Gdx.audio.newMusic(FileHandle("events/resolution02.wav"))
+        eventResolutionSound2.volume = 1f
+        takeSwordSound = Gdx.audio.newMusic(FileHandle("events/take_sword_sound.wav"))
+        takeSwordSound.volume = 1f
     }
 
     /*
@@ -146,14 +162,24 @@ class MyGame : GameBase() {
 
         if (level.levelNumber == 0 && enemies.isEmpty()) {
             level.level1()
+            eventResolutionSound1.play()
             enemies = mutableListOf(
                     CubicMonster(spritesCubicMonster, 7, 4),
                     CubicMonster(spritesCubicMonster, 9, 3)
             )
         }
 
+        if (level.levelNumber == 1 && enemies.isEmpty()) {
+            level.level2()
+            eventResolutionSound1.play()
+            enemies = mutableListOf(
+                    CubicMonster(spritesCubicMonster, 20, 9),
+                    CubicMonster(spritesCubicMonster, 22, 8)
+            )
+        }
+
         if (!isGameOver && level.levelNumber == 1 && enemies.isEmpty()) {
-            println("VICTORY !")
+            eventResolutionSound2.play()
             isGameOver = true
         }
 
@@ -161,8 +187,19 @@ class MyGame : GameBase() {
         drawEnemies()
         drawSpritesStack()
 
-        if (player.isAlive())
+        if (!swordTaken && player.positionX > 16f.toWorldUnits() && player.positionX < 18f.toWorldUnits()
+                && player.positionY > 10f.toWorldUnits() && player.positionY < 12f.toWorldUnits()) {
+            swordTaken = true
+            takeSwordSound.play()
+        }
+
+        if (!swordTaken) {
+            batch.drawSprite(spritesObjects, 17, 11, Config.SPRITE_SIZE, 0, 0)
+        }
+
+        if (player.isAlive()) {
             player.drawCharacter(batch)
+        }
 
         if (displayCoords) {
             drawCoords()
@@ -283,31 +320,32 @@ class MyGame : GameBase() {
                             && enemy.positionY <= player.positionY + 1f.toWorldUnits() && enemy.positionY + 1f.toWorldUnits() >= player.positionY - 1f.toWorldUnits())
                 }
                 player.orientation == Character.Orientation.LEFT -> {
-                    (enemy.positionX >= player.positionX - 1f.toWorldUnits() && enemy.positionX <= player.positionX + 1f.toWorldUnits()
-                            && enemy.positionY >= player.positionY && enemy.positionY + 1f.toWorldUnits() <= player.positionY - 1f.toWorldUnits())
+                    (enemy.positionX > player.positionX - 2f.toWorldUnits() && enemy.positionX <= player.positionX + 1f.toWorldUnits()
+                            && enemy.positionY + 1f.toWorldUnits() >= player.positionY && enemy.positionY <= player.positionY + 2f.toWorldUnits())
                 }
                 else -> false
             }
 
     private fun computeEnemyRecoil(enemy: Character) {
         val (recoilX, recoilY) = enemy.getEnemyRecoil(player.positionX, player.positionY)
+        println(recoilX)
         if (recoilX > 0) {
             if (level.canMoveRight(enemy.positionX, enemy.positionY, recoilX)) {
                 enemy.moveRight(recoilX)
             }
         } else {
             if (level.canMoveLeft(enemy.positionX, enemy.positionY, recoilX)) {
-                enemy.moveLeft(-recoilX)
+                enemy.moveRight(recoilX)
             }
         }
 
         if (recoilY > 0) {
             if (level.canMoveUp(enemy.positionX, enemy.positionY, recoilY)) {
-                enemy.moveUp(recoilY)
+                enemy.moveDown(recoilY)
             }
         } else {
             if (level.canMoveDown(enemy.positionX, enemy.positionY, recoilY)) {
-                enemy.moveDown(-recoilY)
+                enemy.moveDown(recoilY)
             }
         }
     }
@@ -383,7 +421,7 @@ class MyGame : GameBase() {
                 else music.play()
             }
             Input.Keys.ALT_LEFT -> {
-                if (player.isAlive()) {
+                if (player.isAlive() && swordTaken) {
                     player.currentState = "FIGHT"
 
                     // try sword animation
@@ -412,9 +450,18 @@ class MyGame : GameBase() {
         batch.dispose()
         spritesCharacter.dispose()
         spritesEnv.dispose()
+        spritesObjects.dispose()
         renderer.dispose()
         music.dispose()
         walkSound.dispose()
+        monsterGruntSound.dispose()
+        monsterDeathSound1.dispose()
+        monsterGruntSound2.dispose()
+        monsterGruntSound3.dispose()
+        gameOverSound.dispose()
+        swordHitSound.dispose()
+        takeSwordSound.dispose()
+        swordSound.dispose()
         font.dispose()
     }
 

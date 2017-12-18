@@ -80,7 +80,9 @@ open class Character(var texture: Texture) {
 
     fun moveRight(distance: Float) {
         currentState = "RUNNING"
+        println("$positionX+$distance")
         positionX += distance
+        println("=>+$distance")
         orientation = Orientation.RIGHT
     }
 
@@ -128,9 +130,7 @@ open class Character(var texture: Texture) {
             // moveX is the distance the enemy go back on playerY axis
             moveY = Math.sqrt(1 - moveX * moveX)
         }
-
-        if (playerX > positionX) moveX = -moveX
-        if (playerY > positionY) moveY = -moveY
+        println(moveX)
 
         return Pair(moveX.toFloat().toWorldUnits(), moveY.toFloat().toWorldUnits())
     }

@@ -20,7 +20,7 @@ inline fun Batch.drawSprite(texture: Texture, x: Int, y: Int, spriteSize: Float,
             flipX, flipY) // flip
 }
 
-inline fun Batch.drawSprite(texture: Texture, x: Float, y: Float, spriteSize: Float, spriteX: Int, spriteY: Int, flipX: Boolean = false, flipY: Boolean = false) {
+inline fun Batch.drawSprite(texture: Texture, x: Float, y: Float, spriteSize: Float = Config.SPRITE_SIZE, spriteX: Int, spriteY: Int, flipX: Boolean = false, flipY: Boolean = false) {
     draw(texture,
             x, y, // world coordinates
             0f, 0f, // world origins

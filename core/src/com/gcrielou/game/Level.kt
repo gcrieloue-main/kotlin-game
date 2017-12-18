@@ -36,6 +36,7 @@ class Level(var texture: Texture) {
         private const val MUSH1 = "MUSH1"
         private const val MUSH2 = "MUSH2"
         private const val H_WAY = "HWAY"
+        private const val HEWAY = "HEWAY"
         private const val V_WAY = "VWAY"
         private const val CTWAY = "CTWAY"
         private const val FLOA1 = "FLOA1"
@@ -58,6 +59,7 @@ class Level(var texture: Texture) {
     var tileB = Tile(Sprite(1, 4))
     var tileCBR = Tile(Sprite(5, 4))
     var tileHWAY = Tile(Sprite(7, 0))
+    var tileHEWAY = Tile(Sprite(9, 6))
     var tileVWAY = Tile(Sprite(6, 1))
     var tileCTWAY = Tile(Sprite(6, 0))
 
@@ -83,6 +85,7 @@ class Level(var texture: Texture) {
             RIG_G to tileR,
             LEF_G to tileL,
             H_WAY to tileHWAY,
+            HEWAY to tileHEWAY,
             V_WAY to tileVWAY,
             CTWAY to tileCTWAY,
             FLOA1 to tileFLOA1,
@@ -109,38 +112,38 @@ class Level(var texture: Texture) {
         var levelLayer1: ArrayList<ArrayList<String>>
 
         levelLayer1 = arrayListOf(
-                arrayListOf(CTL_G, TOP_G, TOP_G, CTR_G),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G),
-                arrayListOf(CBL_G, BOT_G, BOT_G, CBR_G),
-                arrayListOf(FLOA1, FLOA2, FLOA2, FLOA3)
+                arrayListOf(CTL_G, TOP_G, TOP_G, CTR_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(LEF_G, MID_G, MID_G, MID_G, H_WAY, H_WAY, HEWAY),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(CBL_G, BOT_G, BOT_G, CBR_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(FLOA1, FLOA2, FLOA2, FLOA3, EMPTY, EMPTY, EMPTY)
         )
 
         elementsLayer = arrayListOf(
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, ROCK1, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, MUSH1, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY),
-                arrayListOf(EMPTY, ROCK2, EMPTY, EMPTY),
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY)
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, ROCK1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, MUSH1, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, ROCK2, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
         )
 
 
         // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
-        val shiftY = 5
+        val shiftY = 6
         val shiftX = 11
         levelLayer = fusionLevelArray(ArrayList<ArrayList<String>>(), levelLayer1.reversed(), shiftX, shiftY)
         elementsLayer = fusionLevelArray(ArrayList<ArrayList<String>>(), elementsLayer.reversed(), shiftX, shiftY)
     }
 
-    public fun level1() {
+    fun level1() {
         levelNumber = 1
         var levelLayer1: ArrayList<ArrayList<String>>
         var elementsLayer1: ArrayList<ArrayList<String>>
@@ -187,6 +190,43 @@ class Level(var texture: Texture) {
         // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
         levelLayer = fusionLevelArray(levelLayer, levelLayer1.reversed(), shift, shift)
         elementsLayer = fusionLevelArray(elementsLayer, elementsLayer1.reversed(), shift, shift)
+    }
+
+    fun level2() {
+        levelNumber = 2
+        var levelLayer1: ArrayList<ArrayList<String>>
+        var elementsLayer1: ArrayList<ArrayList<String>>
+
+        levelLayer1 = arrayListOf(
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CTL_G, TOP_G, TOP_G, CTR_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(MID_G, H_WAY, H_WAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CBL_G, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, FLOA1, CBL_G, BOT_G, CBR_G),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3)
+        )
+
+        elementsLayer1 = arrayListOf(
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK1, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, MUSH1, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, ROCK2, EMPTY, EMPTY),
+                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
+        )
+
+        val shiftX = 14
+        val shiftY = 4
+
+        // reverse for easier manipulation with (x,y) = (0,0) in the bottom left of the level representation
+        levelLayer = fusionLevelArray(levelLayer, levelLayer1.reversed(), shiftX, shiftY)
+        elementsLayer = fusionLevelArray(elementsLayer, elementsLayer1.reversed(), shiftX, shiftY)
     }
 
     fun draw(batch: Batch) {
@@ -280,7 +320,8 @@ class Level(var texture: Texture) {
                     fusionLevel.get(ay + y).add(EMPTY)
                 }
                 val yArray: ArrayList<String> = fusionLevel.get(ay + y)
-                yArray[ax + x] = sprite
+                if (sprite != EMPTY)
+                    yArray[ax + x] = sprite
             }
         }
 

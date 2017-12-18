@@ -28,7 +28,6 @@ class BlueCubicMonster(texture: Texture, x: Int, y: Int) : CubicMonster(texture,
         get() = super.health
         set(value) {
             super.health = value
-            println(value)
         }
 
 }
