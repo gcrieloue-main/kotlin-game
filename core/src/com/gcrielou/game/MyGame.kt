@@ -242,18 +242,22 @@ class MyGame : GameBase() {
         if (Input.Keys.DOWN.isKeyPressed()) {
             if (level.canMoveDown(player.positionX, player.positionY, distance))
                 player.moveDown(distance)
+            animateWalkDirt()
         }
         if (Input.Keys.UP.isKeyPressed()) {
             if (level.canMoveUp(player.positionX, player.positionY, distance))
                 player.moveUp(distance)
+            animateWalkDirt()
         }
         if (Input.Keys.RIGHT.isKeyPressed()) {
             if (level.canMoveRight(player.positionX, player.positionY, distance))
                 player.moveRight(distance)
+            animateWalkDirt()
         }
         if (Input.Keys.LEFT.isKeyPressed()) {
             if (level.canMoveLeft(player.positionX, player.positionY, distance))
                 player.moveLeft(distance)
+            animateWalkDirt()
         }
         if (Input.Keys.SPACE.isKeyPressed()) {
             player.currentState = "JUMP"
@@ -313,6 +317,17 @@ class MyGame : GameBase() {
         spritesStack.add(PositionedSprite(Sprite(0, 2), player.positionX, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
         spritesStack.add(PositionedSprite(Sprite(1, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY + Config.SPRITE_SIZE_WORLD_UNIT, spritesCubicMonster))
         spritesStack.add(PositionedSprite(Sprite(2, 2), player.positionX + Config.SPRITE_SIZE_WORLD_UNIT, player.positionY, spritesCubicMonster))
+    }
+
+    var lastWalkAnimation = 0f
+    private fun animateWalkDirt() {
+        if (lastWalkAnimation > 0.5f) {
+            spritesStack.add(PositionedSprite(Sprite(0, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            spritesStack.add(PositionedSprite(Sprite(1, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            spritesStack.add(PositionedSprite(Sprite(2, 5), player.positionX - 0.2f.toWorldUnits(), player.positionY - 0.2f.toWorldUnits(), spritesCubicMonster))
+            lastWalkAnimation = 0f
+        }
+        lastWalkAnimation += Gdx.graphics.deltaTime
     }
 
     override fun keyDown(keycode: Int): Boolean {
