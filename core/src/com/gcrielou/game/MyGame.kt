@@ -329,7 +329,7 @@ class MyGame : GameBase() {
 
                     lastSpriteDraw += Gdx.graphics.deltaTime
                     if (lastSpriteDraw > 0.05) {
-                        spritesStack.removeAt(0)
+                        animation.removeAt(0)
                         lastSpriteDraw = 0f
                     }
                 }
