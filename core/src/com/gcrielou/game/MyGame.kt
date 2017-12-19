@@ -286,8 +286,7 @@ class MyGame : GameBase() {
     private fun hurtEnemiesArround() {
         for (enemy in enemies) {
             if (enemy.isAlive()) {
-                val enemyhurt = isEnemyhurt(enemy)
-                if (enemyhurt) {
+                if (player.isHurtingEnemy(enemy)) {
                     swordHitSound.play()
                     enemy.loseHealth()
                     if (enemy.isAlive()) {
@@ -307,23 +306,6 @@ class MyGame : GameBase() {
                 Math.random() > 0.5 -> monsterGruntSound.play()
                 Math.random() > 0.7 -> monsterGruntSound2.play()
                 else -> monsterGruntSound3.play()
-            }
-
-    private fun isEnemyhurt(enemy: Character): Boolean =
-            when {
-                player.orientation == Character.Orientation.RIGHT || player.orientation == Character.Orientation.UP -> {
-                    (enemy.positionX >= player.positionX && enemy.positionX <= player.positionX + 2f.toWorldUnits()
-                            && enemy.positionY + 1f.toWorldUnits() >= player.positionY && enemy.positionY <= player.positionY + 2f.toWorldUnits())
-                }
-                player.orientation == Character.Orientation.DOWN -> {
-                    (enemy.positionX <= player.positionX + 1f.toWorldUnits() && enemy.positionX >= player.positionX - 1f.toWorldUnits()
-                            && enemy.positionY <= player.positionY + 1f.toWorldUnits() && enemy.positionY + 1f.toWorldUnits() >= player.positionY - 1f.toWorldUnits())
-                }
-                player.orientation == Character.Orientation.LEFT -> {
-                    (enemy.positionX > player.positionX - 2f.toWorldUnits() && enemy.positionX <= player.positionX + 1f.toWorldUnits()
-                            && enemy.positionY + 1f.toWorldUnits() >= player.positionY && enemy.positionY <= player.positionY + 2f.toWorldUnits())
-                }
-                else -> false
             }
 
     private fun computeEnemyRecoil(enemy: Character) {

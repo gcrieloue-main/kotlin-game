@@ -1,6 +1,7 @@
 package com.gcrielou.game
 
 import com.badlogic.gdx.graphics.Texture
+import utils.toWorldUnits
 
 /**
  * Created by gilles on 09-Dec-17.
@@ -14,4 +15,21 @@ class Player(texture: Texture) : Character(texture) {
             "JUMP" to arrayOf(Sprite(12, 1), Sprite(12, 2)),
             "FIGHT" to arrayOf(Sprite(3, 3))
     )
+
+    fun isHurtingEnemy(enemy: Character): Boolean =
+            when {
+                orientation == Character.Orientation.RIGHT || orientation == Character.Orientation.UP -> {
+                    (enemy.positionX >= positionX && enemy.positionX <= positionX + 2f.toWorldUnits()
+                            && enemy.positionY + 1f.toWorldUnits() >= positionY && enemy.positionY <= positionY + 2f.toWorldUnits())
+                }
+                orientation == Character.Orientation.DOWN -> {
+                    (enemy.positionX <= positionX + 1f.toWorldUnits() && enemy.positionX >= positionX - 1f.toWorldUnits()
+                            && enemy.positionY <= positionY + 1f.toWorldUnits() && enemy.positionY + 1f.toWorldUnits() >= positionY - 1f.toWorldUnits())
+                }
+                orientation == Character.Orientation.LEFT -> {
+                    (enemy.positionX > positionX - 2f.toWorldUnits() && enemy.positionX <= positionX + 1f.toWorldUnits()
+                            && enemy.positionY + 1f.toWorldUnits() >= positionY && enemy.positionY <= positionY + 2f.toWorldUnits())
+                }
+                else -> false
+            }
 }
