@@ -20,7 +20,7 @@ open class Character(var texture: Texture) {
         NONE
     }
 
-    var currentState = "IDLE"
+    open var currentState = "IDLE"
     private var lastState = "RUNNING"
 
     var positionX = 2f * Config.SPRITE_SIZE_WORLD_UNIT
@@ -42,6 +42,8 @@ open class Character(var texture: Texture) {
             "FIGHT" to arrayOf(Sprite(1, 3), Sprite(2, 3), Sprite(3, 3), Sprite(4, 3))
     )
 
+    open var endStates = listOf("DEAD")
+
     fun drawCharacter(batch: Batch) {
 
         // change state, reset sprite animation
@@ -55,6 +57,11 @@ open class Character(var texture: Texture) {
 
         val deltaTime = Gdx.graphics.deltaTime
         lastAnimationDrawing += deltaTime
+
+        // if state is an end state, we do not loop on sprites
+        if (endStates.contains(currentState) && currentSprite == sprites?.size?.minus(1)) {
+            return
+        }
 
         if (lastAnimationDrawing >= animationSpeed) {
             val nbSprites = sprites?.size ?: 0
@@ -90,20 +97,23 @@ open class Character(var texture: Texture) {
     }
 
     fun moveUp(distance: Float) {
+        currentState = "RUNNING"
         positionY += distance
         orientation = Orientation.UP
     }
 
     fun moveDown(distance: Float) {
+        currentState = "RUNNING"
         positionY -= distance
         orientation = Orientation.DOWN
     }
 
     open fun computePlayerMoveLength() = Gdx.graphics.deltaTime * Config.PLAYER_SPEED
 
+    /**
+     * we want the enemy to go back in the character opposite direction for distanceX distance of 1 sprite
+     */
     fun getEnemyRecoil(playerX: Float, playerY: Float): Pair<Float, Float> {
-        // we want the enemy to go back in the character opposite direction for distanceX distance of 1 sprite
-
         var moveX = 0.0
         var moveY = 0.0
 
@@ -132,7 +142,7 @@ open class Character(var texture: Texture) {
         return Pair(moveX.toFloat().toWorldUnits(), moveY.toFloat().toWorldUnits())
     }
 
-    fun loseHealth() {
+    open fun loseHealth() {
         health--
     }
 

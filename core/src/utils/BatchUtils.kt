@@ -2,7 +2,9 @@ package utils
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.gcrielou.game.Config
+import com.gcrielou.game.Player
 
 /**
  * Created by gcrielou on 05/12/2017.
@@ -40,4 +42,18 @@ inline fun Batch.use(action: () -> Unit) {
     begin()
     action()
     end()
+}
+
+fun drawCoords(player: Player, font: BitmapFont, batch: Batch) {
+
+    font.draw(batch,
+            "${(player.positionX.toSpriteUnits().floor())},${(player.positionY.toSpriteUnits().floor())} (Sprites floor)",
+            Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 20f)
+    font.draw(batch,
+            "${(player.positionX.toSpriteUnits())},${(player.positionY.toSpriteUnits())} (Sprites)",
+            Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 40f)
+    font.draw(batch,
+            "${player.positionX},${player.positionY} (World Units)",
+            Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 60f)
+
 }

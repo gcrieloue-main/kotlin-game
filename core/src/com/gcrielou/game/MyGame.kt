@@ -74,6 +74,7 @@ class MyGame : GameBase() {
         enemies = mutableListOf(
                 BlueCubicMonster(spritesCubicMonster, 12, 9)
         )
+
         player = Player(spritesCharacter)
         player.positionX = 11f.toWorldUnits()
         player.positionY = 12f.toWorldUnits()
@@ -160,25 +161,21 @@ class MyGame : GameBase() {
             gameOverSound.play()
         }
 
-        if (level.levelNumber == 0 && enemies.isEmpty()) {
+        if (level.levelNumber == 0 && enemies.all { !it.isAlive() }) {
             level.level1()
             eventResolutionSound1.play()
-            enemies = mutableListOf(
-                    CubicMonster(spritesCubicMonster, 7, 4),
-                    CubicMonster(spritesCubicMonster, 9, 3)
-            )
+            enemies.add(CubicMonster(spritesCubicMonster, 7, 4))
+            enemies.add(CubicMonster(spritesCubicMonster, 9, 3))
         }
 
-        if (level.levelNumber == 1 && enemies.isEmpty()) {
+        if (level.levelNumber == 1 && enemies.all { !it.isAlive() }) {
             level.level2()
             eventResolutionSound1.play()
-            enemies = mutableListOf(
-                    CubicMonster(spritesCubicMonster, 20, 9),
-                    CubicMonster(spritesCubicMonster, 22, 8)
-            )
+            enemies.add(CubicMonster(spritesCubicMonster, 20, 9))
+            enemies.add(CubicMonster(spritesCubicMonster, 22, 8))
         }
 
-        if (!isGameOver && level.levelNumber == 1 && enemies.isEmpty()) {
+        if (!isGameOver && level.levelNumber == 1 && enemies.all { !it.isAlive() }) {
             eventResolutionSound2.play()
             isGameOver = true
         }
@@ -202,7 +199,7 @@ class MyGame : GameBase() {
         }
 
         if (displayCoords) {
-            drawCoords()
+            drawCoords(player, font, batch)
         }
 
         if (player.isAlive())
@@ -212,8 +209,8 @@ class MyGame : GameBase() {
 
     fun drawEnemies() {
         for (enemy in enemies) {
+            enemy.drawCharacter(batch)
             if (enemy.isAlive()) {
-                enemy.drawCharacter(batch)
                 handleEnemyBehavior(enemy)
             }
         }
@@ -298,7 +295,6 @@ class MyGame : GameBase() {
                 }
             }
         }
-        enemies.removeIf { !it.isAlive() }
     }
 
     private fun enemyHurtSound() =
@@ -462,17 +458,5 @@ class MyGame : GameBase() {
         renderer.end()
     }
 
-    private fun drawCoords() {
-        if (displayCoords) {
-            font.draw(batch,
-                    "${(player.positionX.toSpriteUnits().floor())},${(player.positionY.toSpriteUnits().floor())} (Sprites floor)",
-                    Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 20f)
-            font.draw(batch,
-                    "${(player.positionX.toSpriteUnits())},${(player.positionY.toSpriteUnits())} (Sprites)",
-                    Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 40f)
-            font.draw(batch,
-                    "${player.positionX},${player.positionY} (World Units)",
-                    Config.WORLD_HEIGHT - 20f, Config.WORLD_HEIGHT - 60f)
-        }
-    }
+
 }
