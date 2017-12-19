@@ -18,8 +18,7 @@ class BlueCubicMonster(texture: Texture, x: Int, y: Int) : CubicMonster(texture,
 
     override var statesSprites: Map<String, Array<Sprite>> = mapOf(
             "IDLE" to arrayOf(Sprite(0, 3), Sprite(1, 3), Sprite(2, 3)),
-            "RUNNING" to arrayOf(Sprite(0, 4), Sprite(1, 4),
-                    Sprite(2, 1)),
+            "RUNNING" to arrayOf(Sprite(0, 4), Sprite(1, 4), Sprite(2, 4)),
             "RUNNING_LEFT" to arrayOf(Sprite(0, 4, 1, true), Sprite(1, 4, 1, true),
                     Sprite(2, 4, 1, true))
     )

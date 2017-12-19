@@ -128,7 +128,6 @@ open class Character(var texture: Texture) {
             // moveX is the distance the enemy go back on playerY axis
             moveY = Math.sqrt(1 - moveX * moveX)
         }
-        println(moveX)
 
         return Pair(moveX.toFloat().toWorldUnits(), moveY.toFloat().toWorldUnits())
     }
