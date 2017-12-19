@@ -116,7 +116,7 @@ class Level(var texture: Texture) {
                 arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
                 arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
                 arrayListOf(LEF_G, MID_G, MID_G, MID_G, H_WAY, H_WAY, HEWAY),
-                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
+                arrayListOf(LEF_G, MID_G, MID_G, RIG_G, FLOA2, FLOA2, FLOA3),
                 arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
                 arrayListOf(LEF_G, MID_G, MID_G, RIG_G, EMPTY, EMPTY, EMPTY),
                 arrayListOf(CBL_G, BOT_G, BOT_G, CBR_G, EMPTY, EMPTY, EMPTY),
@@ -203,7 +203,7 @@ class Level(var texture: Texture) {
                 arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
                 arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
                 arrayListOf(MID_G, H_WAY, H_WAY, H_WAY, H_WAY, H_WAY, MID_G, MID_G, MID_G, RIG_G),
-                arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, LEF_G, MID_G, MID_G, RIG_G),
+                arrayListOf(EMPTY, FLOA2, FLOA2, FLOA2, FLOA2, FLOA2, LEF_G, MID_G, MID_G, RIG_G),
                 arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, CBL_G, MID_G, MID_G, RIG_G),
                 arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, FLOA1, CBL_G, BOT_G, CBR_G),
                 arrayListOf(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, FLOA1, FLOA2, FLOA3)
